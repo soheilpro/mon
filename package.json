@@ -1,0 +1,35 @@
+{
+  "name": "mon",
+  "version": "0.0.0",
+  "description": "Painless performance monitoring for Windows.",
+  "main": "mon.js",
+  "dependencies": {
+    "colors": "~1.0.3",
+    "perfmon": "~0.2.0",
+    "optimist": "~0.6.1",
+    "numeral": "~1.5.3",
+    "underscore": "~1.7.0"
+  },
+  "devDependencies": {},
+  "preferGlobal": true,
+  "bin": {
+    "mon": "./mon.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/soheilpro/mon"
+  },
+  "keywords": [
+    "mon",
+    "perfmon",
+    "windows"
+  ],
+  "author": "Soheil Rashidi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/soheilpro/mon/issues"
+  }
+}
