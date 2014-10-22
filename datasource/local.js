@@ -1,9 +1,10 @@
+var fs = require('fs');
 var util = require("util");
 var events = require("events");
 var perfmon = require('perfmon');
 var _ = require("underscore");
 
-function LocalDataSource() {
+function LocalDataSource(argv) {
 }
 
 util.inherits(LocalDataSource, events.EventEmitter);

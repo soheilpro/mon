@@ -1,12 +1,12 @@
 var http = require('http');
 var Messenger = require('../messenger.js');
 
-function ServerRenderer(dataSource, port) {
+function ServerController(dataSource, argv) {
   this.dataSource = dataSource;
-  this.port = port;
+  this.port = argv.port;
 }
 
-ServerRenderer.prototype.start = function() {
+ServerController.prototype.run = function() {
   var _this = this;
 
   http.createServer(function (request, response) {
@@ -35,8 +35,4 @@ ServerRenderer.prototype.start = function() {
   }).listen(this.port);
 }
 
-ServerRenderer.prototype.stop = function() {
-  this.dataSource.stop();
-};
-
-module.exports = ServerRenderer;
+module.exports = ServerController;

@@ -1,12 +1,14 @@
+var fs = require('fs');
 var colors = require('colors');
 var numeral = require('numeral');
 var _ = require("underscore");
 
-function ConsoleRenderer(dataSource) {
+function ConsoleController(dataSource, argv) {
   this.dataSource = dataSource;
+  this.config = JSON.parse(fs.readFileSync(argv._[0]).toString());
 }
 
-ConsoleRenderer.prototype.start = function(config) {
+ConsoleController.prototype.run = function() {
   cls();
 
   this.dataSource.on("error", function(error) {
@@ -38,14 +40,10 @@ ConsoleRenderer.prototype.start = function(config) {
     });
   });
 
-  this.dataSource.start(config);
+  this.dataSource.start(this.config);
 };
 
-ConsoleRenderer.prototype.stop = function() {
-  this.dataSource.stop();
-};
-
-module.exports = ConsoleRenderer;
+module.exports = ConsoleController;
 
 function thresholdToColor(threshold) {
   if (!threshold)

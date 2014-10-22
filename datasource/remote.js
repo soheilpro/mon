@@ -1,11 +1,12 @@
+var fs = require('fs');
 var util = require("util");
 var events = require("events");
 var http = require('http');
 var Messenger = require('../messenger.js');
 
-function RemoteDataSource(address, port) {
-  this.address = address;
-  this.port = port;
+function RemoteDataSource(argv) {
+  this.address = argv.address;
+  this.port = argv.port;
 }
 
 util.inherits(RemoteDataSource, events.EventEmitter);
@@ -19,7 +20,7 @@ RemoteDataSource.prototype.start = function(config) {
     method: 'POST'
   };
 
-  this.request = http.request(options, function(response) {
+  var request = http.request(options, function(response) {
     if (response.statusCode != 200) {
       console.error('Failed to connect.');
       return;
@@ -44,6 +45,8 @@ RemoteDataSource.prototype.start = function(config) {
   var requestMessenger = new Messenger(request);
   requestMessenger.send(JSON.stringify(config));
   request.end();
+
+  this.request = request;
 
   _this.emit("start");
 };
