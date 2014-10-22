@@ -20,6 +20,9 @@ ConsoleRenderer.prototype.start = function(config) {
     var counters = _.chain(snapshot.groups).map(function(group) { return group.counters }).flatten().map(function(counter) { return counter.name }).value();
     var maxNameLength = _.max(_.union(groups, counters), function(item) { return item.length }).length;
 
+    console.log(new Date(snapshot.time));
+    console.log();
+
     snapshot.groups.forEach(function(group) {
       var indentation = repeat(' ', maxNameLength - group.name.length + 2);
       console.log(indentation + group.name.cyan);
