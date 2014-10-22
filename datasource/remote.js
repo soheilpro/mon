@@ -1,6 +1,7 @@
 var util = require("util");
 var events = require("events");
 var http = require('http');
+var Messenger = require('../messenger.js');
 
 function RemoteDataSource(address, port) {
   this.address = address;
@@ -24,12 +25,14 @@ RemoteDataSource.prototype.start = function(config) {
       return;
     }
 
+    var responseMessenger = new Messenger(response);
+
     response.on('error', function(error) {
       _this.emit("error", error);
     });
 
-    response.on('data', function(chunk) {
-      var snapshot = JSON.parse(chunk);
+    responseMessenger.on('message', function(message) {
+      var snapshot = JSON.parse(message);
       _this.emit("snapshot", snapshot);
     });
   });
@@ -38,7 +41,8 @@ RemoteDataSource.prototype.start = function(config) {
     console.error(error);
   });
 
-  request.write(JSON.stringify(config));
+  var requestMessenger = new Messenger(request);
+  requestMessenger.send(JSON.stringify(config));
   request.end();
 };
 

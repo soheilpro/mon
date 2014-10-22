@@ -11,7 +11,7 @@ var optimist = require('optimist')
     .usage('Usage:' + eol +
            '  mon <config file>' + eol +
            '  mon --server --port <port>' + eol +
-           '  mon --client --address <address> --port <port>');
+           '  mon --client --address <address> --port <port> <config file>');
 
 if (optimist.argv.server) {
   if (!optimist.argv.port) {

@@ -1,4 +1,5 @@
 var http = require('http');
+var Messenger = require('../messenger.js');
 
 function ServerRenderer(dataSource, port) {
   this.dataSource = dataSource;
@@ -9,8 +10,11 @@ ServerRenderer.prototype.start = function() {
   var _this = this;
 
   http.createServer(function (request, response) {
-    request.once("data", function(chunk) {
-      var config = JSON.parse(chunk);
+    var requestMessenger = new Messenger(request);
+
+    requestMessenger.once("message", function(message) {
+      var config = JSON.parse(message);
+      var responseMessenger = new Messenger(response);
 
       response.writeHead(200);
 
@@ -19,7 +23,7 @@ ServerRenderer.prototype.start = function() {
       });
 
       _this.dataSource.on("snapshot", function(snapshot) {
-        response.write(JSON.stringify(snapshot));
+        responseMessenger.send(JSON.stringify(snapshot));
       });
 
       _this.dataSource.start(config);
