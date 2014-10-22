@@ -45,6 +45,13 @@ LocalDataSource.prototype.start = function(config) {
 
     _this.emit("snapshot", snapshot);
   });
+
+  _this.emit("start");
+};
+
+LocalDataSource.prototype.stop = function() {
+  perfmon.stop();
+  this.emit("stop");
 };
 
 module.exports = LocalDataSource;

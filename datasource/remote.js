@@ -19,7 +19,7 @@ RemoteDataSource.prototype.start = function(config) {
     method: 'POST'
   };
 
-  var request = http.request(options, function(response) {
+  this.request = http.request(options, function(response) {
     if (response.statusCode != 200) {
       console.error('Failed to connect.');
       return;
@@ -44,6 +44,14 @@ RemoteDataSource.prototype.start = function(config) {
   var requestMessenger = new Messenger(request);
   requestMessenger.send(JSON.stringify(config));
   request.end();
+
+  _this.emit("start");
+};
+
+RemoteDataSource.prototype.stop = function() {
+  if (this.request)
+    this.request.abort();
+  _this.emit("stop");
 };
 
 module.exports = RemoteDataSource;

@@ -12,6 +12,10 @@ ServerRenderer.prototype.start = function() {
   http.createServer(function (request, response) {
     var requestMessenger = new Messenger(request);
 
+    request.on("close", function() {
+      _this.dataSource.stop();
+    });
+
     requestMessenger.once("message", function(message) {
       var config = JSON.parse(message);
       var responseMessenger = new Messenger(response);
@@ -30,5 +34,9 @@ ServerRenderer.prototype.start = function() {
     });
   }).listen(this.port);
 }
+
+ServerRenderer.prototype.stop = function() {
+  this.dataSource.stop();
+};
 
 module.exports = ServerRenderer;

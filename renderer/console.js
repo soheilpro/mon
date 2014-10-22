@@ -41,6 +41,10 @@ ConsoleRenderer.prototype.start = function(config) {
   this.dataSource.start(config);
 };
 
+ConsoleRenderer.prototype.stop = function() {
+  this.dataSource.stop();
+};
+
 module.exports = ConsoleRenderer;
 
 function thresholdToColor(threshold) {
