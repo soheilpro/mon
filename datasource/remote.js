@@ -54,7 +54,8 @@ RemoteDataSource.prototype.start = function(config) {
 RemoteDataSource.prototype.stop = function() {
   if (this.request)
     this.request.abort();
-  _this.emit("stop");
+
+  this.emit("stop");
 };
 
 module.exports = RemoteDataSource;

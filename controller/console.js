@@ -9,7 +9,13 @@ function ConsoleController(dataSource, argv) {
 }
 
 ConsoleController.prototype.run = function() {
+  var _this = this;
+
   cls();
+
+  process.on("SIGINT", function() {
+    _this.dataSource.stop();
+  });
 
   this.dataSource.on("error", function(error) {
     console.error(error);
