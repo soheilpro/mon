@@ -1,7 +1,16 @@
+var util = require("util");
+var events = require("events");
 var perfmon = require('perfmon');
 var _ = require("underscore");
 
-exports.start = function(config, callback) {
+function LocalDataSource() {
+}
+
+util.inherits(LocalDataSource, events.EventEmitter);
+
+LocalDataSource.prototype.start = function(config) {
+  var _this = this;
+
   var counters = _.chain(config.groups)
                   .map(function(group) { return group.counters })
                   .flatten()
@@ -10,9 +19,8 @@ exports.start = function(config, callback) {
                   .value();
 
   perfmon(counters, function(error, data) {
-    console.log(data);
     if (error) {
-      callback(error);
+      _this.emit("error", error);
       return;
     }
 
@@ -34,9 +42,11 @@ exports.start = function(config, callback) {
       })
     };
 
-    callback(null, snapshot);
+    _this.emit("snapshot", snapshot);
   });
-}
+};
+
+module.exports = LocalDataSource;
 
 function getThresholdByValue(value, thresholds) {
   if (!thresholds)
