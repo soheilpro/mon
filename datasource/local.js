@@ -30,6 +30,7 @@ LocalDataSource.prototype.start = function(config) {
       groups: _.map(config.groups, function(group) {
         return {
           name: group.name,
+          column: group.column || 1,
           counters: _.map(group.counters, function(counter) {
             var value = data.counters[counter.id];
 

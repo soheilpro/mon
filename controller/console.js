@@ -27,23 +27,32 @@ ConsoleController.prototype.run = function() {
     var groups = _.chain(snapshot.groups).map(function(group) { return group.name }).value();
     var counters = _.chain(snapshot.groups).map(function(group) { return group.counters }).flatten().map(function(counter) { return counter.name }).value();
     var maxNameLength = _.max(_.union(groups, counters), function(item) { return item.length }).length;
+    var maxColumns = _.chain(snapshot.groups).max(function(group) { return group.column }).value().column;
+    var columnWidth = process.stdout.columns / maxColumns;
 
     console.log(new Date(snapshot.time));
     console.log();
 
-    snapshot.groups.forEach(function(group) {
-      var indentation = repeat(' ', maxNameLength - group.name.length + 2);
-      console.log(indentation + group.name.cyan);
+    for (var i = 0; i <= maxColumns; i++) {
+      var columnX = Math.floor((i - 1) * columnWidth);
+      process.stdout.cursorTo(0, 2);
 
-      group.counters.forEach(function(counter) {
-        var indentation = repeat(' ', maxNameLength - counter.name.length + 1);
-        var color = thresholdToColor(counter.threshold);
+      _.where(snapshot.groups, {column: i}).forEach(function(group) {
+        var indentation = repeat(' ', maxNameLength - group.name.length + 2);
+        process.stdout.cursorTo(columnX);
+        console.log(indentation + group.name.cyan);
 
-        console.log(indentation + counter.name + ': ' + color(numeral(counter.value).format(counter.format)));
+        group.counters.forEach(function(counter) {
+          var indentation = repeat(' ', maxNameLength - counter.name.length + 1);
+          var color = thresholdToColor(counter.threshold);
+
+          process.stdout.cursorTo(columnX);
+          console.log(indentation + counter.name + ': ' + color(numeral(counter.value).format(counter.format)));
+        });
+
+        console.log();
       });
-
-      console.log();
-    });
+    };
   });
 
   this.dataSource.start(this.config);
