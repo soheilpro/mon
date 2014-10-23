@@ -40,16 +40,27 @@ ConsoleController.prototype.run = function() {
       process.stdout.cursorTo(0, 2);
 
       _.where(snapshot.groups, {column: i}).forEach(function(group) {
-        var indentation = repeat(" ", maxNameLength - group.name.length + 2);
+        var indentation = maxNameLength - group.name.length + 2;
         process.stdout.cursorTo(columnX);
-        console.log(indentation + group.name.cyan);
+        console.log(repeat(" ", indentation) + group.name.cyan);
 
         group.counters.forEach(function(counter) {
-          var indentation = repeat(" ", maxNameLength - counter.name.length + 1);
+          var indentation = maxNameLength - counter.name.length + 1;
           var color = thresholdToColor(counter.threshold);
+          var value = color(numeral(counter.value).format(counter.format));
 
           process.stdout.cursorTo(columnX);
-          console.log(indentation + counter.name + ": " + color(numeral(counter.value).format(counter.format)));
+          console.log(repeat(" ", indentation) + counter.name + ": " + value);
+
+          if (counter.stats) {
+            counter.stats.forEach(function(stat) {
+              var indentation = maxNameLength - stat.name.length + 1;
+
+              process.stdout.cursorTo(columnX);
+              console.log(repeat(" ", indentation) + (stat.name + ": ").gray + thresholdToColor(stat.threshold)(numeral(stat.value).format(counter.format)));
+              console.log();
+            });
+          }
         });
 
         console.log();

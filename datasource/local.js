@@ -40,11 +40,30 @@ LocalDataSource.prototype.start = function(config) {
           counters: _.map(group.counters, function(counter) {
             var value = data.counters[counter.id];
 
+            if (counter.stats) {
+              if (!counter.history)
+                counter.history = [];
+
+              counter.history.push(value);
+              counter.history = _.last(counter.history, _.max(_.map(counter.stats, function(stat) { return stat.count })));
+
+              var stats = _.map(counter.stats, function(stat) {
+                var value = _this.calc(_.last(counter.history, stat.count), stat.func);
+
+                return {
+                  name: stat.func + "(" + stat.count + ")",
+                  value: value,
+                  threshold: getThresholdByValue(value, counter.threshold)
+                };
+              });
+            }
+
             return {
               name: counter.name,
               value: value,
               format: counter.format || "0,0",
-              threshold: getThresholdByValue(value, counter.threshold)
+              threshold: getThresholdByValue(value, counter.threshold),
+              stats: stats,
             };
           }),
         };
@@ -86,9 +105,28 @@ LocalDataSource.prototype.normalize = function(config) {
 
       if (counter.threshold)
         counter.threshold = _.map(counter.threshold, function(v, k) { return {"level": k, "name": v} });
+
+      if (counter.stats) {
+        counter.stats.forEach(function(stat, index) {
+          var match = /(\w+)\((\d+)\)/.exec(stat);
+          if (match)
+            counter.stats[index] = {
+              func: match[1],
+              count: match[2]
+            };
+        });
+      }
     });
   });
 }
+
+LocalDataSource.prototype.calc = function(data, func) {
+  if (func == "sum")
+    return _.reduce(data, function(memo, item) { return memo + item }, 0);
+
+  if (func == "avg")
+    return _.reduce(data, function(memo, item) { return memo + item }, 0) / data.length;
+};
 
 module.exports = LocalDataSource;
 
