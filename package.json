@@ -5,10 +5,10 @@
   "main": "mon.js",
   "dependencies": {
     "colors": "~1.0.3",
-    "perfmon": "~0.2.0",
     "optimist": "~0.6.1",
     "numeral": "~1.5.3",
-    "underscore": "~1.7.0"
+    "underscore": "~1.7.0",
+    "csv-parse": "0.0.6"
   },
   "devDependencies": {},
   "preferGlobal": true,

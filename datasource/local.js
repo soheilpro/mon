@@ -1,7 +1,7 @@
 var fs = require("fs");
 var util = require("util");
 var events = require("events");
-var perfmon = require("perfmon");
+var Perfmon = require("../perfmon.js");
 var _ = require("underscore");
 
 function LocalDataSource(argv) {
@@ -24,12 +24,10 @@ LocalDataSource.prototype.start = function(config) {
                   .unique()
                   .value();
 
-  perfmon(counters, function(error, data) {
-    if (error) {
-      _this.emit("error", error);
-      return;
-    }
+  var perfmon = new Perfmon(counters);
+  perfmon.start();
 
+  perfmon.on("data", function(data) {
     var snapshot = {
       host: data.host,
       time: data.time,
@@ -38,7 +36,8 @@ LocalDataSource.prototype.start = function(config) {
           name: group.name,
           column: group.column || 1,
           counters: _.map(group.counters, function(counter) {
-            var value = data.counters[counter.id];
+            var match = _.find(data.counters, function(item) { return item.name === counter.id });
+            var value = match ? match.value : NaN;
 
             if (counter.stats) {
               if (!counter.history)
@@ -73,13 +72,15 @@ LocalDataSource.prototype.start = function(config) {
     _this.emit("snapshot", snapshot);
   });
 
+  _this.perfmon = perfmon;
+
   _this.emit("start");
 };
 
 LocalDataSource.prototype.stop = function() {
   var _this = this;
 
-  perfmon.stop();
+  _this.perfmon.stop();
   _this.emit("stop");
 };
 
