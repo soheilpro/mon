@@ -1,8 +1,8 @@
-var fs = require('fs');
+var fs = require("fs");
 var util = require("util");
 var events = require("events");
-var http = require('http');
-var Messenger = require('../messenger.js');
+var http = require("http");
+var Messenger = require("../messenger.js");
 
 function RemoteDataSource(argv) {
   var _this = this;
@@ -19,22 +19,22 @@ RemoteDataSource.prototype.start = function(config) {
   var options = {
     hostname: _this.address,
     port: _this.port,
-    method: 'POST'
+    method: "POST"
   };
 
   var request = http.request(options, function(response) {
     if (response.statusCode != 200) {
-      console.error('Failed to connect.');
+      console.error("Failed to connect.");
       return;
     }
 
     var responseMessenger = new Messenger(response);
 
-    response.on('error', function(error) {
+    response.on("error", function(error) {
       _this.emit("error", error);
     });
 
-    responseMessenger.on('message', function(message) {
+    responseMessenger.on("message", function(message) {
       var snapshot = JSON.parse(message);
       _this.emit("snapshot", snapshot);
     });

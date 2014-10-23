@@ -1,6 +1,6 @@
-var fs = require('fs');
-var colors = require('colors');
-var numeral = require('numeral');
+var fs = require("fs");
+var colors = require("colors");
+var numeral = require("numeral");
 var _ = require("underscore");
 
 function ConsoleController(dataSource, argv) {
@@ -32,7 +32,7 @@ ConsoleController.prototype.run = function() {
     var maxColumns = _.chain(snapshot.groups).max(function(group) { return group.column }).value().column;
     var columnWidth = process.stdout.columns / maxColumns;
 
-    console.log(snapshot.host + ' @ ' + new Date(snapshot.time));
+    console.log(snapshot.host + " @ " + new Date(snapshot.time));
     console.log();
 
     for (var i = 0; i <= maxColumns; i++) {
@@ -40,16 +40,16 @@ ConsoleController.prototype.run = function() {
       process.stdout.cursorTo(0, 2);
 
       _.where(snapshot.groups, {column: i}).forEach(function(group) {
-        var indentation = repeat(' ', maxNameLength - group.name.length + 2);
+        var indentation = repeat(" ", maxNameLength - group.name.length + 2);
         process.stdout.cursorTo(columnX);
         console.log(indentation + group.name.cyan);
 
         group.counters.forEach(function(counter) {
-          var indentation = repeat(' ', maxNameLength - counter.name.length + 1);
+          var indentation = repeat(" ", maxNameLength - counter.name.length + 1);
           var color = thresholdToColor(counter.threshold);
 
           process.stdout.cursorTo(columnX);
-          console.log(indentation + counter.name + ': ' + color(numeral(counter.value).format(counter.format)));
+          console.log(indentation + counter.name + ": " + color(numeral(counter.value).format(counter.format)));
         });
 
         console.log();
@@ -76,7 +76,7 @@ function thresholdToColor(threshold) {
 }
 
 function cls() {
-  process.stdout.write('\u001B[2J\u001B[0;0f');
+  process.stdout.write("\u001B[2J\u001B[0;0f");
 }
 
 function repeat(str, num) {

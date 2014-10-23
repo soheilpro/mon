@@ -9,7 +9,7 @@ function Messenger(stream, messageHeaderSize) {
 
   var data = new Buffer(0);
 
-  stream.on('data', function(chunk) {
+  stream.on("data", function(chunk) {
     data = Buffer.concat([data, chunk]);
 
     if (data.length < _this.messageHeaderSize)
@@ -27,7 +27,7 @@ function Messenger(stream, messageHeaderSize) {
     data.copy(message, 0, _this.messageHeaderSize, _this.messageHeaderSize + messageSize);
     data = data.slice(_this.messageHeaderSize + messageSize);
 
-    _this.emit('message', message);
+    _this.emit("message", message);
   })
 }
 
@@ -36,7 +36,7 @@ util.inherits(Messenger, events.EventEmitter);
 Messenger.prototype.send = function(message) {
   var _this = this;
 
-  _this.stream.write((new Array(_this.messageHeaderSize + 1).join('0') + message.length).substr(-_this.messageHeaderSize, _this.messageHeaderSize));
+  _this.stream.write((new Array(_this.messageHeaderSize + 1).join("0") + message.length).substr(-_this.messageHeaderSize, _this.messageHeaderSize));
   _this.stream.write(message);
 };
 

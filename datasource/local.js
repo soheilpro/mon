@@ -1,7 +1,7 @@
-var fs = require('fs');
+var fs = require("fs");
 var util = require("util");
 var events = require("events");
-var perfmon = require('perfmon');
+var perfmon = require("perfmon");
 var _ = require("underscore");
 
 function LocalDataSource(argv) {
@@ -43,7 +43,7 @@ LocalDataSource.prototype.start = function(config) {
             return {
               name: counter.name,
               value: value,
-              format: counter.format || '0,0',
+              format: counter.format || "0,0",
               threshold: getThresholdByValue(value, counter.threshold)
             };
           }),
@@ -78,14 +78,14 @@ LocalDataSource.prototype.normalize = function(config) {
       }
 
       counter.id = counter.id.replace(/%\w+%/gi, function(match) {
-        return config.variables ? config.variables[match.replace(/%/g, '')] || "" : "";
+        return config.variables ? config.variables[match.replace(/%/g, "")] || "" : "";
       })
 
       if (!counter.name)
         counter.name = /\\([^\\]+)\\(.+)/.exec(counter.id)[2];
 
       if (counter.threshold)
-        counter.threshold = _.map(counter.threshold, function(v, k) { return {'level': k, 'name': v} });
+        counter.threshold = _.map(counter.threshold, function(v, k) { return {"level": k, "name": v} });
     });
   });
 }

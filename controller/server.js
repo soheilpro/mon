@@ -1,5 +1,5 @@
-var http = require('http');
-var Messenger = require('../messenger.js');
+var http = require("http");
+var Messenger = require("../messenger.js");
 
 function ServerController(dataSource, argv) {
   var _this = this;
