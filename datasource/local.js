@@ -26,6 +26,7 @@ LocalDataSource.prototype.start = function(config) {
     }
 
     var snapshot = {
+      host: data.host,
       time: data.time,
       groups: _.map(config.groups, function(group) {
         return {

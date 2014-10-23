@@ -30,7 +30,7 @@ ConsoleController.prototype.run = function() {
     var maxColumns = _.chain(snapshot.groups).max(function(group) { return group.column }).value().column;
     var columnWidth = process.stdout.columns / maxColumns;
 
-    console.log(new Date(snapshot.time));
+    console.log(snapshot.host + ' @ ' + new Date(snapshot.time));
     console.log();
 
     for (var i = 0; i <= maxColumns; i++) {
