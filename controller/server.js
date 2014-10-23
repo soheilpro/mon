@@ -2,8 +2,10 @@ var http = require('http');
 var Messenger = require('../messenger.js');
 
 function ServerController(dataSource, argv) {
-  this.dataSource = dataSource;
-  this.port = argv.port;
+  var _this = this;
+
+  _this.dataSource = dataSource;
+  _this.port = argv.port;
 }
 
 ServerController.prototype.run = function() {
@@ -32,7 +34,7 @@ ServerController.prototype.run = function() {
 
       _this.dataSource.start(config);
     });
-  }).listen(this.port);
+  }).listen(_this.port);
 }
 
 module.exports = ServerController;

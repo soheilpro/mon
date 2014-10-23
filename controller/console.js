@@ -4,8 +4,10 @@ var numeral = require('numeral');
 var _ = require("underscore");
 
 function ConsoleController(dataSource, argv) {
-  this.dataSource = dataSource;
-  this.config = JSON.parse(fs.readFileSync(argv._[0]).toString());
+  var _this = this;
+
+  _this.dataSource = dataSource;
+  _this.config = JSON.parse(fs.readFileSync(argv._[0]).toString());
 }
 
 ConsoleController.prototype.run = function() {
@@ -17,11 +19,11 @@ ConsoleController.prototype.run = function() {
     _this.dataSource.stop();
   });
 
-  this.dataSource.on("error", function(error) {
+  _this.dataSource.on("error", function(error) {
     console.error(error);
   });
 
-  this.dataSource.on("snapshot", function(snapshot) {
+  _this.dataSource.on("snapshot", function(snapshot) {
     cls();
 
     var groups = _.chain(snapshot.groups).map(function(group) { return group.name }).value();
@@ -55,7 +57,7 @@ ConsoleController.prototype.run = function() {
     };
   });
 
-  this.dataSource.start(this.config);
+  _this.dataSource.start(_this.config);
 };
 
 module.exports = ConsoleController;

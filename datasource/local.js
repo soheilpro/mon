@@ -5,7 +5,9 @@ var perfmon = require('perfmon');
 var _ = require("underscore");
 
 function LocalDataSource(argv) {
-  this.argv = argv;
+  var _this = this;
+
+  _this.argv = argv;
 }
 
 util.inherits(LocalDataSource, events.EventEmitter);
@@ -13,7 +15,7 @@ util.inherits(LocalDataSource, events.EventEmitter);
 LocalDataSource.prototype.start = function(config) {
   var _this = this;
 
-  this.normalize(config);
+  _this.normalize(config);
 
   var counters = _.chain(config.groups)
                   .map(function(group) { return group.counters })
@@ -56,8 +58,10 @@ LocalDataSource.prototype.start = function(config) {
 };
 
 LocalDataSource.prototype.stop = function() {
+  var _this = this;
+
   perfmon.stop();
-  this.emit("stop");
+  _this.emit("stop");
 };
 
 LocalDataSource.prototype.normalize = function(config) {

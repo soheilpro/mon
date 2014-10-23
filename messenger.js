@@ -2,10 +2,11 @@ var util = require("util");
 var events = require("events");
 
 function Messenger(stream, messageHeaderSize) {
-  this.stream = stream;
-  this.messageHeaderSize = messageHeaderSize || 4;
-
   var _this = this;
+
+  _this.stream = stream;
+  _this.messageHeaderSize = messageHeaderSize || 4;
+
   var data = new Buffer(0);
 
   stream.on('data', function(chunk) {
@@ -33,8 +34,10 @@ function Messenger(stream, messageHeaderSize) {
 util.inherits(Messenger, events.EventEmitter);
 
 Messenger.prototype.send = function(message) {
-  this.stream.write((new Array(this.messageHeaderSize + 1).join('0') + message.length).substr(-this.messageHeaderSize, this.messageHeaderSize));
-  this.stream.write(message);
+  var _this = this;
+
+  _this.stream.write((new Array(_this.messageHeaderSize + 1).join('0') + message.length).substr(-_this.messageHeaderSize, _this.messageHeaderSize));
+  _this.stream.write(message);
 };
 
 module.exports = Messenger;
