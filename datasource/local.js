@@ -12,6 +12,8 @@ util.inherits(LocalDataSource, events.EventEmitter);
 LocalDataSource.prototype.start = function(config) {
   var _this = this;
 
+  normalize(config);
+
   var counters = _.chain(config.groups)
                   .map(function(group) { return group.counters })
                   .flatten()
@@ -59,12 +61,31 @@ LocalDataSource.prototype.stop = function() {
 
 module.exports = LocalDataSource;
 
+function normalize(config) {
+  config.groups.forEach(function (group) {
+    group.counters.forEach(function (counter, index) {
+      if (_.isString(counter)) {
+        counter = {
+          id: counter
+        };
+
+        group.counters[index] = counter;
+      }
+
+      if (!counter.name)
+        counter.name = /\\([^\\]+)\\(.+)/.exec(counter.id)[2];
+
+      if (counter.threshold)
+        counter.threshold = _.map(counter.threshold, function(v, k) { return {'level': k, 'name': v} });
+    });
+  });
+}
+
 function getThresholdByValue(value, thresholds) {
   if (!thresholds)
     return null;
 
   return _.chain(thresholds)
-          .map(function(v, k) { return {'level': k, 'name': v} })
           .filter(function(item) { return item.level >= value })
           .sortBy(function(item) { item.name })
           .first()
