@@ -5,6 +5,7 @@ var perfmon = require('perfmon');
 var _ = require("underscore");
 
 function LocalDataSource(argv) {
+  this.argv = argv;
 }
 
 util.inherits(LocalDataSource, events.EventEmitter);
@@ -12,7 +13,7 @@ util.inherits(LocalDataSource, events.EventEmitter);
 LocalDataSource.prototype.start = function(config) {
   var _this = this;
 
-  normalize(config);
+  this.normalize(config);
 
   var counters = _.chain(config.groups)
                   .map(function(group) { return group.counters })
@@ -59,9 +60,9 @@ LocalDataSource.prototype.stop = function() {
   this.emit("stop");
 };
 
-module.exports = LocalDataSource;
+LocalDataSource.prototype.normalize = function(config) {
+  var _this = this;
 
-function normalize(config) {
   config.groups.forEach(function (group) {
     group.counters.forEach(function (counter, index) {
       if (_.isString(counter)) {
@@ -72,6 +73,10 @@ function normalize(config) {
         group.counters[index] = counter;
       }
 
+      counter.id = counter.id.replace(/%\w+%/gi, function(match) {
+        return config.variables ? config.variables[match.replace(/%/g, '')] || "" : "";
+      })
+
       if (!counter.name)
         counter.name = /\\([^\\]+)\\(.+)/.exec(counter.id)[2];
 
@@ -80,6 +85,8 @@ function normalize(config) {
     });
   });
 }
+
+module.exports = LocalDataSource;
 
 function getThresholdByValue(value, thresholds) {
   if (!thresholds)
