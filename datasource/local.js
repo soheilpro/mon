@@ -20,6 +20,7 @@ LocalDataSource.prototype.start = function(config) {
   var counters = _.chain(config.groups)
                   .map(function(group) { return group.counters })
                   .flatten()
+                  .compact()
                   .map(function(counter) { return counter.id })
                   .unique()
                   .value();
@@ -88,36 +89,38 @@ LocalDataSource.prototype.normalize = function(config) {
   var _this = this;
 
   config.groups.forEach(function (group) {
-    group.counters.forEach(function (counter, index) {
-      if (_.isString(counter)) {
-        counter = {
-          id: counter
-        };
+    if (group.counters) {
+      group.counters.forEach(function (counter, index) {
+        if (_.isString(counter)) {
+          counter = {
+            id: counter
+          };
 
-        group.counters[index] = counter;
-      }
+          group.counters[index] = counter;
+        }
 
-      counter.id = counter.id.replace(/%\w+%/gi, function(match) {
-        return config.variables ? config.variables[match.replace(/%/g, "")] || "" : "";
-      })
+        counter.id = counter.id.replace(/%\w+%/gi, function(match) {
+          return config.variables ? config.variables[match.replace(/%/g, "")] || "" : "";
+        })
 
-      if (!counter.name)
-        counter.name = /\\([^\\]+)\\(.+)/.exec(counter.id)[2];
+        if (!counter.name)
+          counter.name = /\\([^\\]+)\\(.+)/.exec(counter.id)[2];
 
-      if (counter.threshold)
-        counter.threshold = _.map(counter.threshold, function(v, k) { return {"level": k, "name": v} });
+        if (counter.threshold)
+          counter.threshold = _.map(counter.threshold, function(v, k) { return {"level": k, "name": v} });
 
-      if (counter.stats) {
-        counter.stats.forEach(function(stat, index) {
-          var match = /(\w+)\((\d+)\)/.exec(stat);
-          if (match)
-            counter.stats[index] = {
-              func: match[1],
-              count: match[2]
-            };
-        });
-      }
-    });
+        if (counter.stats) {
+          counter.stats.forEach(function(stat, index) {
+            var match = /(\w+)\((\d+)\)/.exec(stat);
+            if (match)
+              counter.stats[index] = {
+                func: match[1],
+                count: match[2]
+              };
+          });
+        }
+      });
+    }
   });
 }
 
