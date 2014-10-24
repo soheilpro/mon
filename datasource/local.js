@@ -2,6 +2,7 @@ var fs = require("fs");
 var util = require("util");
 var events = require("events");
 var Perfmon = require("../perfmon.js");
+var iis = require("../iis.js");
 var _ = require("underscore");
 
 function LocalDataSource(argv) {
@@ -17,93 +18,109 @@ LocalDataSource.prototype.start = function(config) {
 
   _this.normalize(config);
 
-  var counters = _.chain(config.groups)
-                  .map(function(group) { return [group.counters, group.lists] })
-                  .flatten()
-                  .compact()
-                  .map(function(item) { return item.id })
-                  .unique()
-                  .value();
+  iis.getWorkerProcesses(function(error, processes) {
+    _this.iisWorkerProcesses = !error ? processes : [];
 
-  var perfmon = new Perfmon(counters);
-  perfmon.start();
+    var counters = _.chain(config.groups)
+                    .map(function(group) { return [group.counters, group.lists] })
+                    .flatten()
+                    .compact()
+                    .map(function(item) { return item.id })
+                    .unique()
+                    .value();
 
-  perfmon.on("data", function(data) {
-    var snapshot = {
-      host: data.host,
-      time: data.time,
-      groups: _.map(config.groups, function(group) {
-        return {
-          name: group.name,
-          column: group.column || 1,
-          counters: _.map(group.counters, function(counter) {
-            var match = _.find(data.counters, function(item) { return item.name === counter.id });
-            var value = match ? match.value : NaN;
+    var perfmon = new Perfmon(counters);
+    perfmon.start();
 
-            if (counter.stats) {
-              if (!counter.history)
-                counter.history = [];
+    perfmon.on("data", function(data) {
+      var snapshot = {
+        host: data.host,
+        time: data.time,
+        groups: _.map(config.groups, function(group) {
+          return {
+            name: group.name,
+            column: group.column || 1,
+            counters: _.map(group.counters, function(counter) {
+              var match = _.find(data.counters, function(item) { return item.name === counter.id });
+              var value = match ? match.value : NaN;
 
-              counter.history.push(value);
-              counter.history = _.last(counter.history, _.max(_.map(counter.stats, function(stat) { return stat.count })));
+              if (counter.stats) {
+                if (!counter.history)
+                  counter.history = [];
 
-              var stats = _.map(counter.stats, function(stat) {
-                var value = _this.calc(_.last(counter.history, stat.count), stat.func);
+                counter.history.push(value);
+                counter.history = _.last(counter.history, _.max(_.map(counter.stats, function(stat) { return stat.count })));
 
-                return {
-                  name: stat.func + "(" + stat.count + ")",
-                  value: value,
-                  threshold: getThresholdByValue(value, counter.threshold)
-                };
+                var stats = _.map(counter.stats, function(stat) {
+                  var value = _this.calc(_.last(counter.history, stat.count), stat.func);
+
+                  return {
+                    name: stat.func + "(" + stat.count + ")",
+                    value: value,
+                    threshold: getThresholdByValue(value, counter.threshold)
+                  };
+                });
+              }
+
+              return {
+                name: counter.name,
+                value: value,
+                format: counter.format || "0,0",
+                threshold: getThresholdByValue(value, counter.threshold),
+                stats: stats,
+              };
+            }),
+            lists: _.map(group.lists, function(list) {
+              var regex = new RegExp(list.id.replace(/./g, function(c) { return (c === "*") ? "(.*?)" : "\\x" + c.charCodeAt(0).toString(16) }));
+
+              var items = [];
+              data.counters.forEach(function(counter) {
+                var counterMatch = regex.exec(counter.name);
+
+                if (!counterMatch)
+                  return;
+
+                var name = counterMatch[1];
+
+                if (name[0] === "_")
+                  return;
+
+                var iisWorkerProcessMatch = /w3wp_(\d+)/.exec(name);
+
+                if (iisWorkerProcessMatch) {
+                  var iisWorkerProcessId = parseInt(iisWorkerProcessMatch[1], 10);
+                  var iisWorkerProcess = _.find(_this.iisWorkerProcesses, function(workerProcess) { return workerProcess.processId === iisWorkerProcessId });
+
+                  if (iisWorkerProcess)
+                    name += "/" + iisWorkerProcess.appPool;
+                }
+
+                items.push({
+                  name: name,
+                  value: counter.value,
+                });
               });
-            }
 
-            return {
-              name: counter.name,
-              value: value,
-              format: counter.format || "0,0",
-              threshold: getThresholdByValue(value, counter.threshold),
-              stats: stats,
-            };
-          }),
-          lists: _.map(group.lists, function(list) {
-            var regex = new RegExp(list.id.replace(/./g, function(c) { return (c === "*") ? "(.*?)" : "\\x" + c.charCodeAt(0).toString(16) }));
+              items = _.sortBy(items, function(item) { return (list.sort === "desc" ? -1 : 1) * item.value });
+              items = _.first(items, list.count);
 
-            var items = [];
-            data.counters.forEach(function(counter) {
-              var match = regex.exec(counter.name);
+              return {
+                name: list.name,
+                items: items,
+                format: list.format || "0,0",
+              };
+            }),
+          };
+        })
+      };
 
-              if (!match)
-                return;
+      _this.emit("snapshot", snapshot);
+    });
 
-              if (match[1][0] === "_")
-                return;
+    _this.perfmon = perfmon;
 
-              items.push({
-                name: match[1],
-                value: counter.value,
-              });
-            });
-
-            items = _.sortBy(items, function(item) { return (list.sort === "desc" ? -1 : 1) * item.value });
-            items = _.first(items, list.count);
-
-            return {
-              name: list.name,
-              items: items,
-              format: list.format || "0,0",
-            };
-          }),
-        };
-      })
-    };
-
-    _this.emit("snapshot", snapshot);
+    _this.emit("start");
   });
-
-  _this.perfmon = perfmon;
-
-  _this.emit("start");
 };
 
 LocalDataSource.prototype.stop = function() {
