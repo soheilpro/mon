@@ -30,7 +30,8 @@ ConsoleController.prototype.run = function() {
     var counters = _.chain(snapshot.groups).map(function(group) { return group.counters }).flatten().map(function(counter) { return counter.name }).value();
     var lists = _.chain(snapshot.groups).map(function(group) { return group.lists }).flatten().map(function(list) { return list.name }).value();
     var listItems = _.chain(snapshot.groups).map(function(group) { return group.lists }).flatten().map(function(list) { return list.items }).flatten().map(function(item) { return item.name }).value();
-    var maxNameLength = _.max(_.union(groups, counters, lists, listItems), function(name) { return name.length }).length;
+    var listStatItems = _.chain(snapshot.groups).map(function(group) { return group.lists }).flatten().map(function(list) { return list.stats }).flatten().compact().map(function(stat) { return stat.items }).flatten().map(function(item) { return item.name }).value();
+    var maxNameLength = _.max(_.union(groups, counters, lists, listItems, listStatItems), function(name) { return name.length }).length;
     var maxColumns = _.chain(snapshot.groups).max(function(group) { return group.column }).value().column;
     var columnWidth = process.stdout.columns / maxColumns;
 
@@ -80,6 +81,25 @@ ConsoleController.prototype.run = function() {
           });
 
           console.log();
+
+          if (list.stats) {
+            list.stats.forEach(function(stat) {
+              var indentation = maxNameLength - stat.name.length + 1;
+
+              process.stdout.cursorTo(columnX);
+              console.log(repeat(" ", indentation) + (stat.name + ": ").gray);
+
+              stat.items.forEach(function(item) {
+                var indentation = maxNameLength - item.name.length + 1;
+                var value = numeral(item.value).format(list.format);
+
+                process.stdout.cursorTo(columnX);
+                console.log(repeat(" ", indentation) + item.name + ": " + value);
+              });
+
+              console.log();
+            });
+          }
         });
 
         console.log();

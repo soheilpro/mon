@@ -102,12 +102,38 @@ LocalDataSource.prototype.start = function(config) {
               });
 
               items = _.sortBy(items, function(item) { return (list.sort === "desc" ? -1 : 1) * item.value });
-              items = _.first(items, list.count);
+
+              if (list.stats) {
+                if (!list.history)
+                  list.history = [];
+
+                list.history.push(items);
+                list.history = _.last(list.history, _.max(_.map(list.stats, function(stat) { return stat.count })));
+
+                var stats = _.map(list.stats, function(stat) {
+                  var items = _.zip.apply(null, list.history, stat.count);
+
+                  items.forEach(function(group, index) {
+                    items[index] = {
+                      name: group[0].name,
+                      value: _this.calc(_.map(group, function(item) { return item.value }), stat.func)
+                    };
+                  });
+
+                  items = _.sortBy(items, function(item) { return (list.sort === "desc" ? -1 : 1) * item.value });
+
+                  return {
+                    name: stat.func + "(" + stat.count + ")",
+                    items: _.first(items, list.count),
+                  };
+                });
+              }
 
               return {
                 name: list.name,
-                items: items,
+                items: _.first(items, list.count),
                 format: list.format || "0,0",
+                stats: stats,
               };
             }),
           };
@@ -182,6 +208,17 @@ LocalDataSource.prototype.normalize = function(config) {
 
         if (!list.sort)
           list.sort = "desc";
+
+        if (list.stats) {
+          list.stats.forEach(function(stat, index) {
+            var match = /(\w+)\((\d+)\)/.exec(stat);
+            if (match)
+              list.stats[index] = {
+                func: match[1],
+                count: match[2]
+              };
+          });
+        }
       });
     }
   });

@@ -48,7 +48,7 @@ Perfmon.prototype.start = function() {
 
         var host = counters.length > 0 ? /\\\\(\w+)\\/.exec(counters[0])[1] : "";
         var time = new Date(row[0]);
-        var values = _.without(_.rest(row, 1), "-1");
+        var values = _.rest(row, 1);
 
         if (!missingCounterIndexes) {
           missingCounterIndexes = [];
