@@ -18,10 +18,10 @@ LocalDataSource.prototype.start = function(config) {
   _this.normalize(config);
 
   var counters = _.chain(config.groups)
-                  .map(function(group) { return group.counters })
+                  .map(function(group) { return [group.counters, group.lists] })
                   .flatten()
                   .compact()
-                  .map(function(counter) { return counter.id })
+                  .map(function(item) { return item.id })
                   .unique()
                   .value();
 
@@ -64,6 +64,34 @@ LocalDataSource.prototype.start = function(config) {
               format: counter.format || "0,0",
               threshold: getThresholdByValue(value, counter.threshold),
               stats: stats,
+            };
+          }),
+          lists: _.map(group.lists, function(list) {
+            var regex = new RegExp(list.id.replace(/./g, function(c) { return (c === "*") ? "(.*?)" : "\\x" + c.charCodeAt(0).toString(16) }));
+
+            var items = [];
+            data.counters.forEach(function(counter) {
+              var match = regex.exec(counter.name);
+
+              if (!match)
+                return;
+
+              if (match[1][0] === "_")
+                return;
+
+              items.push({
+                name: match[1],
+                value: counter.value,
+              });
+            });
+
+            items = _.sortBy(items, function(item) { return (list.sort === "desc" ? -1 : 1) * item.value });
+            items = _.first(items, list.count);
+
+            return {
+              name: list.name,
+              items: items,
+              format: list.format || "0,0",
             };
           }),
         };
@@ -119,6 +147,24 @@ LocalDataSource.prototype.normalize = function(config) {
               };
           });
         }
+      });
+    }
+
+    if (group.lists) {
+      group.lists.forEach(function (list, index) {
+        if (_.isString(group.list)) {
+          list = {
+            id: group.list
+          };
+
+          group.lists[index] = list;
+        }
+
+        if (!list.count)
+          list.count = 5;
+
+        if (!list.sort)
+          list.sort = "desc";
       });
     }
   });
