@@ -66,20 +66,22 @@ ConsoleController.prototype.run = function() {
         group.counters.forEach(function(counter) {
           var indentation = maxNameLength - counter.name.length + 1;
           var color = thresholdToColor(counter.threshold);
-          var value = color(numeral(counter.value).format(counter.format));
+          var value = numeral(counter.value).format(counter.format);
           var stats = "";
 
           if (counter.stats) {
             counter.stats.forEach(function(stat) {
               var indentation = maxNameLength - stat.name.length + 1;
+              var color = thresholdToColor(stat.threshold);
+              var value = numeral(stat.value).format(counter.format);
 
               process.stdout.cursorTo(columnX);
-              stats += "  " + (stat.name + ": ").dim + thresholdToColor(stat.threshold)(numeral(stat.value).format(counter.format));
+              stats += "  " + (stat.name + ": ").dim + color(value);
             });
           }
 
           process.stdout.cursorTo(columnX);
-          console.log(repeat(" ", indentation) + counter.name + ": " + value + stats);
+          console.log(repeat(" ", indentation) + counter.name + ": " + color(value) + stats);
         });
 
         group.lists.forEach(function(list) {
