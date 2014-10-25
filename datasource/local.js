@@ -178,7 +178,12 @@ LocalDataSource.prototype.normalize = function(config) {
           counter.name = /\\([^\\]+)\\(.+)/.exec(counter.id)[2];
 
         if (counter.threshold)
-          counter.threshold = _.map(counter.threshold, function(v, k) { return {"level": k, "name": v} });
+          counter.threshold = _.map(counter.threshold, function(v, k) {
+            return {
+              "level": (k === "*" ? Number.MAX_VALUE : k),
+              "name": v
+            }
+          });
 
         if (counter.stats) {
           counter.stats.forEach(function(stat, index) {
