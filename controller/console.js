@@ -9,6 +9,18 @@ function ConsoleController(DataSource, argv) {
   _this.DataSource = DataSource;
   _this.argv = argv;
   _this.config = JSON.parse(fs.readFileSync(argv._[0]).toString());
+  _this.config.variables = _this.config.variables || {};
+
+  if (argv.var) {
+    if (!_.isArray(argv.var))
+      argv.var = [argv.var];
+
+    argv.var.forEach(function(variable) {
+      var match = /^(.*?)=(.*?)$/.exec(variable);
+      if (match)
+        _this.config.variables[match[1]] = match[2];
+    });
+  }
 }
 
 ConsoleController.prototype.run = function() {
