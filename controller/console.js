@@ -67,19 +67,19 @@ ConsoleController.prototype.run = function() {
           var indentation = maxNameLength - counter.name.length + 1;
           var color = thresholdToColor(counter.threshold);
           var value = color(numeral(counter.value).format(counter.format));
-
-          process.stdout.cursorTo(columnX);
-          console.log(repeat(" ", indentation) + counter.name + ": " + value);
+          var stats = "";
 
           if (counter.stats) {
             counter.stats.forEach(function(stat) {
               var indentation = maxNameLength - stat.name.length + 1;
 
               process.stdout.cursorTo(columnX);
-              console.log(repeat(" ", indentation) + (stat.name + ": ").gray + thresholdToColor(stat.threshold)(numeral(stat.value).format(counter.format)));
-              console.log();
+              stats += "  " + (stat.name + ": ").dim + thresholdToColor(stat.threshold)(numeral(stat.value).format(counter.format));
             });
           }
+
+          process.stdout.cursorTo(columnX);
+          console.log(repeat(" ", indentation) + counter.name + ": " + value + stats);
         });
 
         group.lists.forEach(function(list) {
@@ -103,7 +103,7 @@ ConsoleController.prototype.run = function() {
               var indentation = maxNameLength - stat.name.length + 1;
 
               process.stdout.cursorTo(columnX);
-              console.log(repeat(" ", indentation) + (stat.name + ": ").gray);
+              console.log(repeat(" ", indentation) + (stat.name + ": ").dim);
 
               stat.items.forEach(function(item) {
                 var indentation = maxNameLength - item.name.length + 1;
