@@ -1,10 +1,11 @@
 var http = require("http");
 var Messenger = require("../messenger.js");
 
-function ServerController(dataSource, argv) {
+function ServerController(DataSource, argv) {
   var _this = this;
 
-  _this.dataSource = dataSource;
+  _this.DataSource = DataSource;
+  _this.argv = argv;
   _this.port = argv.port;
 }
 
@@ -22,7 +23,7 @@ ServerController.prototype.run = function() {
       var config = JSON.parse(message);
       var responseMessenger = new Messenger(response);
 
-      response.writeHead(200);
+      _this.dataSource = new _this.DataSource(_this.argv);
 
       _this.dataSource.on("error", function(error) {
         console.error(error);
@@ -33,6 +34,8 @@ ServerController.prototype.run = function() {
       });
 
       _this.dataSource.start(config);
+
+      response.writeHead(200);
     });
   }).listen(_this.port);
 }

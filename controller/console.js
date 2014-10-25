@@ -3,10 +3,11 @@ var colors = require("colors");
 var numeral = require("numeral");
 var _ = require("underscore");
 
-function ConsoleController(dataSource, argv) {
+function ConsoleController(DataSource, argv) {
   var _this = this;
 
-  _this.dataSource = dataSource;
+  _this.DataSource = DataSource;
+  _this.argv = argv;
   _this.config = JSON.parse(fs.readFileSync(argv._[0]).toString());
 }
 
@@ -14,6 +15,8 @@ ConsoleController.prototype.run = function() {
   var _this = this;
 
   cls();
+
+  _this.dataSource = new _this.DataSource(_this.argv);
 
   process.on("SIGINT", function() {
     _this.dataSource.stop();

@@ -27,6 +27,5 @@ else {
   Controller = ConsoleController;
 }
 
-var dataSource = new DataSource(optimist.argv);
-var controller = new Controller(dataSource, optimist.argv);
+var controller = new Controller(DataSource, optimist.argv);
 controller.run();
