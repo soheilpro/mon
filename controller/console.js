@@ -41,23 +41,24 @@ ConsoleController.prototype.run = function() {
   _this.dataSource.on("snapshot", function(snapshot) {
     cls();
 
-    var groups = _.chain(snapshot.groups).map(function(group) { return group.name }).value();
-    var counters = _.chain(snapshot.groups).map(function(group) { return group.counters }).flatten().map(function(counter) { return counter.name }).value();
-    var lists = _.chain(snapshot.groups).map(function(group) { return group.lists }).flatten().map(function(list) { return list.name }).value();
-    var listItems = _.chain(snapshot.groups).map(function(group) { return group.lists }).flatten().map(function(list) { return list.items }).flatten().map(function(item) { return item.name }).value();
-    var listStatItems = _.chain(snapshot.groups).map(function(group) { return group.lists }).flatten().map(function(list) { return list.stats }).flatten().compact().map(function(stat) { return stat.items }).flatten().map(function(item) { return item.name }).value();
-    var maxNameLength = _.max(_.union(groups, counters, lists, listItems, listStatItems), function(name) { return name.length }).length;
-    var maxColumns = _.chain(snapshot.groups).max(function(group) { return group.column }).value().column;
-    var columnWidth = process.stdout.columns / maxColumns;
-
     console.log(snapshot.host + " @ " + new Date(snapshot.time));
     console.log();
+
+    var maxColumns = _.chain(snapshot.groups).max(function(group) { return group.column }).value().column;
+    var columnWidth = process.stdout.columns / maxColumns;
 
     for (var i = 0; i <= maxColumns; i++) {
       var columnX = Math.floor((i - 1) * columnWidth);
       process.stdout.cursorTo(0, 2);
 
       _.where(snapshot.groups, {column: i}).forEach(function(group) {
+        var groups = _.chain(snapshot.groups).where({column: i}).map(function(group) { return group.name }).value();
+        var counters = _.chain(snapshot.groups).where({column: i}).map(function(group) { return group.counters }).flatten().map(function(counter) { return counter.name }).value();
+        var lists = _.chain(snapshot.groups).where({column: i}).map(function(group) { return group.lists }).flatten().map(function(list) { return list.name }).value();
+        var listItems = _.chain(snapshot.groups).where({column: i}).map(function(group) { return group.lists }).flatten().map(function(list) { return list.items }).flatten().map(function(item) { return item.name }).value();
+        var listStatItems = _.chain(snapshot.groups).where({column: i}).map(function(group) { return group.lists }).flatten().map(function(list) { return list.stats }).flatten().compact().map(function(stat) { return stat.items }).flatten().map(function(item) { return item.name }).value();
+        var maxNameLength = _.max(_.union(groups, counters, lists, listItems, listStatItems), function(name) { return name.length }).length;
+
         var indentation = maxNameLength - group.name.length + 2;
         process.stdout.cursorTo(columnX);
         console.log(repeat(" ", indentation) + group.name.cyan);
