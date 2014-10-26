@@ -56,9 +56,22 @@ ConsoleController.prototype.displaySnapshot = function() {
   if (!_this.snapshot)
     return;
 
+  var delay = (new Date() - new Date(_this.snapshot.time)) / 1000;
+  var delayColor;
+
+  if (delay <= 3)
+    delayColor = colors.bgGreen;
+  else if (delay <= 5)
+    delayColor = colors.bgYellow;
+  else
+    delayColor = colors.bgRed;
+
+  var header = _this.snapshot.host + " / ".dim + new Date(_this.snapshot.time) + " / ".dim + delayColor(numeral(delay).format("0.00"));
+
   cls();
 
-  console.log(_this.snapshot.host + " @ " + new Date(_this.snapshot.time));
+  process.stdout.cursorTo(Math.floor(process.stdout.columns / 2) - Math.floor(header.length / 2), 0);
+  console.log(header);
   console.log();
 
   var maxColumns = _.chain(_this.snapshot.groups).max(function(group) { return group.column }).value().column;
