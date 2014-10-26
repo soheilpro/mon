@@ -152,7 +152,9 @@ LocalDataSource.prototype.start = function(config) {
 LocalDataSource.prototype.stop = function() {
   var _this = this;
 
-  _this.perfmon.stop();
+  if (_this.perfmon)
+    _this.perfmon.stop();
+
   _this.emit("stop");
 };
 
