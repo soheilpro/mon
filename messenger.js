@@ -5,7 +5,7 @@ function Messenger(stream, messageHeaderSize) {
   var _this = this;
 
   _this.stream = stream;
-  _this.messageHeaderSize = messageHeaderSize || 4;
+  _this.messageHeaderSize = messageHeaderSize || 5;
 
   var data = new Buffer(0);
 
