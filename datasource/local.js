@@ -82,7 +82,7 @@ LocalDataSource.prototype.start = function(config) {
 
                 var name = counterMatch[1];
 
-                if (name[0] === "_")
+                if (_.contains(list.exclude, name))
                   return;
 
                 var iisWorkerProcessMatch = /w3wp_(\d+)/.exec(name);
