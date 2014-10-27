@@ -122,10 +122,11 @@ ConsoleController.prototype.displaySnapshot = function() {
 
         list.items.forEach(function(item) {
           var indentation = maxNameLength - item.name.length + 1;
+          var color = thresholdToColor(item.threshold);
           var value = numeral(item.value).format(list.format);
 
           process.stdout.cursorTo(columnX);
-          console.log(repeat(" ", indentation) + item.name + ": " + value);
+          console.log(repeat(" ", indentation) + item.name + ": " + color(value));
         });
 
         console.log();
@@ -139,10 +140,11 @@ ConsoleController.prototype.displaySnapshot = function() {
 
             stat.items.forEach(function(item) {
               var indentation = maxNameLength - item.name.length + 1;
+              var color = thresholdToColor(item.threshold);
               var value = numeral(item.value).format(list.format);
 
               process.stdout.cursorTo(columnX);
-              console.log(repeat(" ", indentation) + item.name + ": " + value);
+              console.log(repeat(" ", indentation) + item.name + ": " + color(value));
             });
 
             console.log();

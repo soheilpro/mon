@@ -98,6 +98,7 @@ LocalDataSource.prototype.start = function(config) {
                 items.push({
                   name: name,
                   value: counter.value,
+                  threshold: getThresholdByValue(counter.value, list.threshold),
                 });
               });
 
@@ -114,9 +115,12 @@ LocalDataSource.prototype.start = function(config) {
                   var items = _.zip.apply(null, list.history, stat.count);
 
                   items.forEach(function(group, index) {
+                    var value = _this.calc(_.map(group, function(item) { return item.value }), stat.func);
+
                     items[index] = {
                       name: group[0].name,
-                      value: _this.calc(_.map(group, function(item) { return item.value }), stat.func)
+                      value: value,
+                      threshold: getThresholdByValue(value, list.threshold),
                     };
                   });
 
@@ -215,6 +219,14 @@ LocalDataSource.prototype.normalize = function(config) {
 
         if (!list.sort)
           list.sort = "desc";
+
+        if (list.threshold)
+          list.threshold = _.map(list.threshold, function(v, k) {
+            return {
+              "level": (k === "*" ? Number.MAX_VALUE : k),
+              "name": v
+            }
+          });
 
         if (list.stats) {
           list.stats.forEach(function(stat, index) {
