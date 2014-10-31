@@ -15,10 +15,14 @@ ConsoleController.prototype.run = function() {
   var _this = this;
   var dataSource;
 
-  if (_this.server)
+  if (_this.server) {
     dataSource = new RemoteDataSource(_this.server);
-  else
+    console.log("Monitoring remote server " + _this.server.hostname + ":" + _this.server.port);
+  }
+  else {
     dataSource = new LocalDataSource();
+    console.log("Monitoring local server");
+  }
 
   process.on("SIGINT", function() {
     clearInterval(_this.timer);
