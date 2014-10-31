@@ -13,8 +13,6 @@ util.inherits(LocalDataSource, events.EventEmitter);
 LocalDataSource.prototype.start = function(config) {
   var _this = this;
 
-  _this.normalize(config);
-
   iis.getWorkerProcesses(function(error, processes) {
     _this.iisWorkerProcesses = !error ? processes : [];
 
@@ -62,7 +60,7 @@ LocalDataSource.prototype.start = function(config) {
               return {
                 name: counter.name,
                 value: value,
-                format: counter.format || "0,0",
+                format: counter.format,
                 threshold: getThresholdByValue(value, counter.threshold),
                 stats: stats,
               };
@@ -133,7 +131,7 @@ LocalDataSource.prototype.start = function(config) {
               return {
                 name: list.name,
                 items: _.first(items, list.count),
-                format: list.format || "0,0",
+                format: list.format,
                 stats: stats,
               };
             }),
@@ -158,87 +156,6 @@ LocalDataSource.prototype.stop = function() {
 
   _this.emit("stop");
 };
-
-LocalDataSource.prototype.normalize = function(config) {
-  var _this = this;
-
-  config.groups.forEach(function (group) {
-    if (group.counters) {
-      group.counters.forEach(function (counter, index) {
-        if (_.isString(counter)) {
-          counter = {
-            id: counter
-          };
-
-          group.counters[index] = counter;
-        }
-
-        counter.id = counter.id.replace(/%\w+%/gi, function(match) {
-          return config.variables ? config.variables[match.replace(/%/g, "")] || "" : "";
-        })
-
-        if (!counter.name)
-          counter.name = /\\([^\\]+)\\(.+)/.exec(counter.id)[2];
-
-        if (counter.threshold)
-          counter.threshold = _.map(counter.threshold, function(v, k) {
-            return {
-              "level": (k === "*" ? Number.MAX_VALUE : k),
-              "name": v
-            }
-          });
-
-        if (counter.stats) {
-          counter.stats.forEach(function(stat, index) {
-            var match = /(\w+)\((\d+)\)/.exec(stat);
-            if (match)
-              counter.stats[index] = {
-                func: match[1],
-                count: match[2]
-              };
-          });
-        }
-      });
-    }
-
-    if (group.lists) {
-      group.lists.forEach(function (list, index) {
-        if (_.isString(group.list)) {
-          list = {
-            id: group.list
-          };
-
-          group.lists[index] = list;
-        }
-
-        if (!list.count)
-          list.count = 5;
-
-        if (!list.sort)
-          list.sort = "desc";
-
-        if (list.threshold)
-          list.threshold = _.map(list.threshold, function(v, k) {
-            return {
-              "level": (k === "*" ? Number.MAX_VALUE : k),
-              "name": v
-            }
-          });
-
-        if (list.stats) {
-          list.stats.forEach(function(stat, index) {
-            var match = /(\w+)\((\d+)\)/.exec(stat);
-            if (match)
-              list.stats[index] = {
-                func: match[1],
-                count: match[2]
-              };
-          });
-        }
-      });
-    }
-  });
-}
 
 LocalDataSource.prototype.calc = function(data, func) {
   if (func == "sum")

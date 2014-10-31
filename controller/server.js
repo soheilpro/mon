@@ -1,6 +1,7 @@
 var http = require("http");
 var LocalDataSource = require("../datasource/local.js");
 var Messenger = require("../messenger.js");
+var Config = require("../config.js");
 
 function ServerController(port) {
   var _this = this;
@@ -21,7 +22,7 @@ ServerController.prototype.run = function() {
     });
 
     requestMessenger.once("message", function(message) {
-      var config = JSON.parse(message);
+      var config = Config.parse(message).instantiate();
       var responseMessenger = new Messenger(response);
 
       dataSource = new LocalDataSource();

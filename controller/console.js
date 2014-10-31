@@ -4,18 +4,11 @@ var colors = require("colors");
 var numeral = require("numeral");
 var _ = require("underscore");
 
-function ConsoleController(server, config, variables) {
+function ConsoleController(server, config) {
   var _this = this;
 
   _this.server = server;
   _this.config = config;
-  _this.config.variables = _this.config.variables || {};
-
-  if (variables) {
-    variables.forEach(function(variable) {
-        _this.config.variables[variable.name] = variable.value;
-    });
-  }
 }
 
 ConsoleController.prototype.run = function() {

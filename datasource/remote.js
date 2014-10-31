@@ -44,7 +44,7 @@ RemoteDataSource.prototype.start = function(config) {
   });
 
   var requestMessenger = new Messenger(request);
-  requestMessenger.send(JSON.stringify(config));
+  requestMessenger.send(config.toString());
   request.end();
 
   _this.request = request;

@@ -4,6 +4,7 @@ var fs = require("fs");
 var url = require("url");
 var ConsoleController = require("./controller/console.js")
 var ServerController = require("./controller/server.js")
+var Config = require("./config.js");
 var eol = require("os").EOL;
 var optimist = require("optimist")
     .usage("Usage:" + eol +
@@ -41,13 +42,6 @@ switch (argv._[0])
       var server = url.parse(argv.server);
     }
 
-    if (!argv._[0]) {
-      console.log(optimist.help());
-      return;
-    }
-
-    var config = JSON.parse(fs.readFileSync(argv._[0]).toString());
-
     if (argv.var) {
       if (!_.isArray(argv.var))
         argv.var = [argv.var];
@@ -65,7 +59,14 @@ switch (argv._[0])
       }));
     }
 
-    controller = new ConsoleController(server, config, variables);
+    if (!argv._[0]) {
+      console.log(optimist.help());
+      return;
+    }
+
+    var config = Config.parse(fs.readFileSync(argv._[0]).toString()).instantiate(variables);
+
+    controller = new ConsoleController(server, config);
 }
 
 if (!controller) {
