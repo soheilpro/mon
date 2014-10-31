@@ -5,10 +5,7 @@ var Perfmon = require("../perfmon.js");
 var iis = require("../iis.js");
 var _ = require("underscore");
 
-function LocalDataSource(argv) {
-  var _this = this;
-
-  _this.argv = argv;
+function LocalDataSource() {
 }
 
 util.inherits(LocalDataSource, events.EventEmitter);

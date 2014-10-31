@@ -4,11 +4,10 @@ var events = require("events");
 var http = require("http");
 var Messenger = require("../messenger.js");
 
-function RemoteDataSource(argv) {
+function RemoteDataSource(server) {
   var _this = this;
 
-  _this.address = argv.address;
-  _this.port = argv.port;
+  _this.server = server;
 }
 
 util.inherits(RemoteDataSource, events.EventEmitter);
@@ -17,8 +16,8 @@ RemoteDataSource.prototype.start = function(config) {
   var _this = this;
 
   var options = {
-    hostname: _this.address,
-    port: _this.port,
+    hostname: _this.server.hostname,
+    port: _this.server.port,
     method: "POST"
   };
 

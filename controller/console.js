@@ -1,47 +1,46 @@
-var fs = require("fs");
+var LocalDataSource = require("../datasource/local.js");
+var RemoteDataSource = require("../datasource/remote.js");
 var colors = require("colors");
 var numeral = require("numeral");
 var _ = require("underscore");
 
-function ConsoleController(DataSource, argv) {
+function ConsoleController(server, config, variables) {
   var _this = this;
 
-  _this.DataSource = DataSource;
-  _this.argv = argv;
-  _this.config = JSON.parse(fs.readFileSync(argv._[0]).toString());
+  _this.server = server;
+  _this.config = config;
   _this.config.variables = _this.config.variables || {};
 
-  if (argv.var) {
-    if (!_.isArray(argv.var))
-      argv.var = [argv.var];
-
-    argv.var.forEach(function(variable) {
-      var match = /^(.*?)=(.*?)$/.exec(variable);
-      if (match)
-        _this.config.variables[match[1]] = match[2];
+  if (variables) {
+    variables.forEach(function(variable) {
+        _this.config.variables[variable.name] = variable.value;
     });
   }
 }
 
 ConsoleController.prototype.run = function() {
   var _this = this;
+  var dataSource;
 
-  _this.dataSource = new _this.DataSource(_this.argv);
+  if (_this.server)
+    dataSource = new RemoteDataSource(_this.server);
+  else
+    dataSource = new LocalDataSource();
 
   process.on("SIGINT", function() {
     clearInterval(_this.timer);
-    _this.dataSource.stop();
+    dataSource.stop();
   });
 
-  _this.dataSource.on("error", function(error) {
+  dataSource.on("error", function(error) {
     console.error(error);
   });
 
-  _this.dataSource.on("snapshot", function(snapshot) {
+  dataSource.on("snapshot", function(snapshot) {
     _this.snapshot = snapshot;
   });
 
-  _this.dataSource.start(_this.config);
+  dataSource.start(_this.config);
 
   _this.timer = setInterval((function(self) {
     return function() {

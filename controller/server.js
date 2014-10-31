@@ -1,12 +1,11 @@
 var http = require("http");
+var LocalDataSource = require("../datasource/local.js");
 var Messenger = require("../messenger.js");
 
-function ServerController(DataSource, argv) {
+function ServerController(port) {
   var _this = this;
 
-  _this.DataSource = DataSource;
-  _this.argv = argv;
-  _this.port = argv.port;
+  _this.port = port;
 }
 
 ServerController.prototype.run = function() {
@@ -14,26 +13,28 @@ ServerController.prototype.run = function() {
 
   http.createServer(function (request, response) {
     var requestMessenger = new Messenger(request);
+    var dataSource;
 
     request.on("close", function() {
-      _this.dataSource.stop();
+      if (dataSource)
+        dataSource.stop();
     });
 
     requestMessenger.once("message", function(message) {
       var config = JSON.parse(message);
       var responseMessenger = new Messenger(response);
 
-      _this.dataSource = new _this.DataSource(_this.argv);
+      dataSource = new LocalDataSource();
 
-      _this.dataSource.on("error", function(error) {
+      dataSource.on("error", function(error) {
         console.error(error);
       });
 
-      _this.dataSource.on("snapshot", function(snapshot) {
+      dataSource.on("snapshot", function(snapshot) {
         responseMessenger.send(JSON.stringify(snapshot));
       });
 
-      _this.dataSource.start(config);
+      dataSource.start(config);
 
       response.writeHead(200);
     });
