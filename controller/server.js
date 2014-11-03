@@ -1,6 +1,6 @@
 var http = require("http");
 var LocalDataSource = require("../datasource/local.js");
-var Messenger = require("../messenger.js");
+var boundary = require("../boundary.js");
 var Config = require("../config.js");
 
 function ServerController(port) {
@@ -15,7 +15,8 @@ ServerController.prototype.run = function() {
   http.createServer(function (request, response) {
     console.log("Client connected: " + request.connection.remoteAddress);
 
-    var requestMessenger = new Messenger(request);
+    var request = boundary.chunked(request);
+    var response = boundary.chunked(response);
     var dataSource;
 
     request.on("close", function() {
@@ -25,9 +26,8 @@ ServerController.prototype.run = function() {
         dataSource.stop();
     });
 
-    requestMessenger.once("message", function(message) {
+    request.once("message", function(message) {
       var config = Config.parse(message).instantiate();
-      var responseMessenger = new Messenger(response);
 
       dataSource = new LocalDataSource();
 
@@ -36,7 +36,7 @@ ServerController.prototype.run = function() {
       });
 
       dataSource.on("snapshot", function(snapshot) {
-        responseMessenger.send(JSON.stringify(snapshot));
+        response.writeMessage(JSON.stringify(snapshot));
       });
 
       dataSource.start(config);

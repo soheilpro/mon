@@ -1,5 +1,5 @@
 var spawn = require("child_process").spawn;
-var eol = require("os").EOL;
+var boundary = require("./boundary.js");
 
 function iis() {
 }
@@ -8,35 +8,27 @@ iis.getWorkerProcesses = function(callback) {
   var _this = this;
 
   var appcmd = spawn("appcmd", ["list", "wps"], { cwd: process.env.windir + "\\system32\\inetsrv" });
-  var data = "";
   var processes = [];
 
-  appcmd.stdout.on("data", function(chunk) {
-    data += chunk.toString();
+  appcmd.stdout = boundary.delimited(appcmd.stdout);
 
-    while (true) {
-      var eolIndex = data.indexOf(eol);
-      if (eolIndex == -1)
-        break;
+  appcmd.stdout.on("message", function(message) {
+    message = message.toString();
 
-      var line = data.substring(0, eolIndex);
-      data = data.substr(eolIndex + eol.length);
+    if (!message)
+      return;
 
-      if (!line)
-        break;
-
-      if (line.indexOf("ERROR") != -1) {
-        callback(line);
-        return;
-      }
-
-      var match = /WP "(\d+)" \(applicationPool:(.+?)\)/.exec(line);
-
-      processes.push({
-        processId: parseInt(match[1], 10),
-        appPool: match[2]
-      });
+    if (message.indexOf("ERROR") != -1) {
+      callback(message);
+      return;
     }
+
+    var match = /WP "(\d+)" \(applicationPool:(.+?)\)/.exec(message);
+
+    processes.push({
+      processId: parseInt(match[1], 10),
+      appPool: match[2]
+    });
   });
 
   appcmd.on("close", function() {

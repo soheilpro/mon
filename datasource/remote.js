@@ -2,7 +2,7 @@ var fs = require("fs");
 var util = require("util");
 var events = require("events");
 var http = require("http");
-var Messenger = require("../messenger.js");
+var boundary = require("../boundary.js");
 
 function RemoteDataSource(server) {
   var _this = this;
@@ -21,19 +21,21 @@ RemoteDataSource.prototype.start = function(config) {
     method: "POST"
   };
 
-  var request = http.request(options, function(response) {
+  var request = boundary.chunked(http.request(options));
+
+  request.on("response", function(response) {
+    var response = boundary.chunked(response);
+
     if (response.statusCode != 200) {
       console.error("Failed to connect.");
       return;
     }
 
-    var responseMessenger = new Messenger(response);
-
     response.on("error", function(error) {
       _this.emit("error", error);
     });
 
-    responseMessenger.on("message", function(message) {
+    response.on("message", function(message) {
       var snapshot = JSON.parse(message);
       _this.emit("snapshot", snapshot);
     });
@@ -43,8 +45,7 @@ RemoteDataSource.prototype.start = function(config) {
     console.error(error);
   });
 
-  var requestMessenger = new Messenger(request);
-  requestMessenger.send(config.toString());
+  request.writeMessage(config.toString());
   request.end();
 
   _this.request = request;
