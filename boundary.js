@@ -16,8 +16,8 @@ function indexOf(buffer1, buffer2) {
   return -1;
 }
 
-module.exports.chunked = function(stream, messageHeaderSize) {
-  messageHeaderSize = messageHeaderSize || 5;
+module.exports.chunked = function(stream) {
+  var marker = new Buffer("\r\n");
   var buffer = new Buffer(0);
 
   var newStream = Object.create(stream);
@@ -25,26 +25,33 @@ module.exports.chunked = function(stream, messageHeaderSize) {
   stream.on("data", function(data) {
     buffer = Buffer.concat([buffer, data]);
 
-    if (buffer.length < messageHeaderSize)
-      return;
+    while (true) {
+      if (messageSize === undefined) {
+        var markerIndex = indexOf(buffer, marker);
+        if (markerIndex === -1)
+          break;
 
-    var sizeBuffer = new Buffer(messageHeaderSize);
-    buffer.copy(sizeBuffer, 0, 0, messageHeaderSize);
+        var messageSizeBuffer = new Buffer(markerIndex);
+        buffer.copy(messageSizeBuffer, 0, 0, markerIndex);
 
-    var messageSize = parseInt(sizeBuffer.toString(), 10);
+        var messageSize = parseInt(messageSizeBuffer.toString(), 10);
+      }
 
-    if (buffer.length < messageHeaderSize + messageSize)
-      return;
+      if (buffer.length < markerIndex + marker.length + messageSize)
+        break;
 
-    var message = new Buffer(messageSize);
-    buffer.copy(message, 0, messageHeaderSize, messageHeaderSize + messageSize);
-    buffer = buffer.slice(messageHeaderSize + messageSize);
+      var message = new Buffer(messageSize);
+      buffer.copy(message, 0, markerIndex + marker.length, markerIndex + marker.length + messageSize);
+      buffer = buffer.slice(markerIndex + marker.length + messageSize);
+      messageSize = undefined;
 
-    newStream.emit("message", message);
+      newStream.emit("message", message);
+    }
   });
 
   newStream.writeMessage = function(message) {
-    stream.write((new Array(messageHeaderSize + 1).join("0") + message.length).substr(-messageHeaderSize, messageHeaderSize));
+    stream.write(message.length.toString());
+    stream.write(marker);
     stream.write(message);
   }
 
