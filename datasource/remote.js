@@ -16,19 +16,30 @@ RemoteDataSource.prototype.start = function(config) {
 
   _this.transport.on("connect", function(connection) {
     var connection = boundary.chunked(connection);
+    var signature = "mon/1";
 
-    connection.writeMessage(config.toString());
+    connection.writeMessage(new Buffer(signature));
 
-    connection.on("error", function(error) {
-      _this.emit("error", error);
+    connection.once("message", function(message) {
+      if (message.toString() !== signature) {
+        _this.emit("error", new Error("Bad server."));
+        connection.close();
+        return;
+      }
+
+      connection.writeMessage(config.toString());
+
+      connection.on("error", function(error) {
+        _this.emit("error", error);
+      });
+
+      connection.on("message", function(message) {
+        var snapshot = JSON.parse(message);
+        _this.emit("snapshot", snapshot);
+      });
+
+      _this.connection = connection;
     });
-
-    connection.on("message", function(message) {
-      var snapshot = JSON.parse(message);
-      _this.emit("snapshot", snapshot);
-    });
-
-    _this.connection = connection;
   });
 
   _this.transport.connect();

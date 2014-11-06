@@ -21,18 +21,30 @@ ServerController.prototype.run = function() {
     var dataSource;
 
     connection.once("message", function(message) {
-      var config = Config.parse(message).instantiate();
-      dataSource = new LocalDataSource();
+      var signature = message.toString();
 
-      dataSource.on("snapshot", function(snapshot) {
-        connection.writeMessage(JSON.stringify(snapshot));
+      if (signature !== "mon/1") {
+        connection.writeMessage("Bad client.");
+        connection.close();
+        return;
+      }
+
+      connection.writeMessage(message);
+
+      connection.once("message", function(message) {
+        var config = Config.parse(message).instantiate();
+        dataSource = new LocalDataSource();
+
+        dataSource.on("snapshot", function(snapshot) {
+          connection.writeMessage(JSON.stringify(snapshot));
+        });
+
+        dataSource.on("error", function(error) {
+          console.error(error);
+        });
+
+        dataSource.start(config);
       });
-
-      dataSource.on("error", function(error) {
-        console.error(error);
-      });
-
-      dataSource.start(config);
     });
 
     connection.on("close", function() {
