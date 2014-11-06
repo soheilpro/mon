@@ -1,3 +1,4 @@
+var HTTPTransport = require("../transport/http.js");
 var LocalDataSource = require("../datasource/local.js");
 var RemoteDataSource = require("../datasource/remote.js");
 var colors = require("colors");
@@ -16,7 +17,8 @@ ConsoleController.prototype.run = function() {
   var dataSource;
 
   if (_this.server) {
-    dataSource = new RemoteDataSource(_this.server);
+    var transport = new HTTPTransport({ server: _this.server });
+    dataSource = new RemoteDataSource(transport);
     console.log("Monitoring remote server " + _this.server.hostname + ":" + _this.server.port);
   }
   else {

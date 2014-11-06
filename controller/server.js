@@ -1,7 +1,7 @@
-var http = require("http");
+var HTTPTransport = require("../transport/http.js");
 var LocalDataSource = require("../datasource/local.js");
-var boundary = require("../boundary.js");
 var Config = require("../config.js");
+var boundary = require("../boundary.js");
 
 function ServerController(port) {
   var _this = this;
@@ -12,38 +12,38 @@ function ServerController(port) {
 ServerController.prototype.run = function() {
   var _this = this;
 
-  http.createServer(function (request, response) {
-    console.log("Client connected: " + request.connection.remoteAddress);
+  var transport = new HTTPTransport({ port: _this.port });
 
-    var request = boundary.chunked(request);
-    var response = boundary.chunked(response);
+  transport.on("connect", function(connection) {
+    console.log("Client connected: " + connection.id());
+
+    var connection = boundary.chunked(connection);
     var dataSource;
 
-    request.on("close", function() {
-      console.log("Client disconnected: " + request.connection.remoteAddress);
-
-      if (dataSource)
-        dataSource.stop();
-    });
-
-    request.once("message", function(message) {
+    connection.once("message", function(message) {
       var config = Config.parse(message).instantiate();
-
       dataSource = new LocalDataSource();
+
+      dataSource.on("snapshot", function(snapshot) {
+        connection.writeMessage(JSON.stringify(snapshot));
+      });
 
       dataSource.on("error", function(error) {
         console.error(error);
       });
 
-      dataSource.on("snapshot", function(snapshot) {
-        response.writeMessage(JSON.stringify(snapshot));
-      });
-
       dataSource.start(config);
-
-      response.writeHead(200);
     });
-  }).listen(_this.port);
+
+    connection.on("close", function() {
+      console.log("Client disconnected: " + connection.id());
+
+      if (dataSource)
+        dataSource.stop();
+    });
+  });
+
+  transport.listen();
 
   console.log("Started server on port " + _this.port);
 }

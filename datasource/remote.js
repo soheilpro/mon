@@ -1,13 +1,12 @@
 var fs = require("fs");
 var util = require("util");
 var events = require("events");
-var http = require("http");
 var boundary = require("../boundary.js");
 
-function RemoteDataSource(server) {
+function RemoteDataSource(transport) {
   var _this = this;
 
-  _this.server = server;
+  _this.transport = transport;
 }
 
 util.inherits(RemoteDataSource, events.EventEmitter);
@@ -15,40 +14,24 @@ util.inherits(RemoteDataSource, events.EventEmitter);
 RemoteDataSource.prototype.start = function(config) {
   var _this = this;
 
-  var options = {
-    hostname: _this.server.hostname,
-    port: _this.server.port,
-    method: "POST"
-  };
+  _this.transport.on("connect", function(connection) {
+    var connection = boundary.chunked(connection);
 
-  var request = boundary.chunked(http.request(options));
+    connection.writeMessage(config.toString());
 
-  request.on("response", function(response) {
-    var response = boundary.chunked(response);
-
-    if (response.statusCode != 200) {
-      console.error("Failed to connect.");
-      return;
-    }
-
-    response.on("error", function(error) {
+    connection.on("error", function(error) {
       _this.emit("error", error);
     });
 
-    response.on("message", function(message) {
+    connection.on("message", function(message) {
       var snapshot = JSON.parse(message);
       _this.emit("snapshot", snapshot);
     });
+
+    _this.connection = connection;
   });
 
-  request.on("error", function(error) {
-    console.error(error);
-  });
-
-  request.writeMessage(config.toString());
-  request.end();
-
-  _this.request = request;
+  _this.transport.connect();
 
   _this.emit("start");
 };
@@ -56,8 +39,8 @@ RemoteDataSource.prototype.start = function(config) {
 RemoteDataSource.prototype.stop = function() {
   var _this = this;
 
-  if (_this.request)
-    _this.request.abort();
+  if (_this.connection)
+    _this.connection.close();
 
   _this.emit("stop");
 };
