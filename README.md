@@ -260,7 +260,7 @@ By default, Performance Counters report multiple processes that have the same na
 
 To have them append the ID of the process instead (like w3wp_1234), follow the instructions in this article: [KB281884](http://support.microsoft.com/kb/281884).
 
-This allows mon to map w3wp processes to their corresponding IIS application pools.
+This allows mon to map w3wp processes to their corresponding IIS application pools. Make sure to run mon as admin for this feature to work,
 
 ## Version History
 + **1.0**
