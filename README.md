@@ -24,14 +24,16 @@ npm install -g monjs
 Monitor the local machine:
 
 ```
-mon <configfile>
+mon [<configfile>]
 ```
 
 Monitor a remote machine:
 
 ```
-mon --server <address>:<port> <configfile>
+mon --server <address>:<port> [<configfile>]
 ```
+
+<b>Note:</b> If no config file is specified, the default (and very simple) config is used.
 
 Start a server that lets client connect to and monitor the local machine:
 
@@ -46,7 +48,7 @@ mon serve [--port <port>]
 ## Config File
 
 To use mon you need to provide it with a config file that specifies which metrics you want to monitor.
-There is a sample config file in the samples folder that you can use as a template.
+There is a default config file in the config directory that you can use as a template.
 
 The format of the config file is as follows:
 
@@ -249,8 +251,8 @@ In your config file replace the name of the instance with your variable:
 and supply a value for it at startup:
 
 ```
-mon <configfile> --var apppool=mysite1
-mon --server <address>:<port> <configfile> --var apppool=mysite1
+mon [<configfile>] --var apppool=mysite1
+mon --server <address>:<port> [<configfile>] --var apppool=mysite1
 ```
 
 ## Process IDs
