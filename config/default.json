@@ -10,10 +10,7 @@
             "50": "ok",
             "75": "warning",
             "100": "critical"
-          },
-          "stats": [
-            "avg(60)"
-          ]
+          }
         },
         {
           "name": "Kernel",
@@ -22,10 +19,7 @@
             "50": "ok",
             "75": "warning",
             "100": "critical"
-          },
-          "stats": [
-            "avg(60)"
-          ]
+          }
         },
         {
           "name": "User",
@@ -34,20 +28,7 @@
             "50": "ok",
             "75": "warning",
             "100": "critical"
-          },
-          "stats": [
-            "avg(60)"
-          ]
-        },
-        {
-          "id": "\\Processor\\% Interrupt Time",
-          "threshold": {
-            "15": "ok",
-            "100": "warning"
-          },
-          "stats": [
-            "avg(60)"
-          ]
+          }
         },
         {
           "id": "\\System\\Processor Queue Length",
@@ -55,10 +36,7 @@
             "50": "ok",
             "100": "warning",
             "*": "critical"
-          },
-          "stats": [
-            "avg(60)"
-          ]
+          }
         }
       ]
     },
@@ -81,54 +59,12 @@
           }
         },
         {
-          "id": "\\Memory\\Pages Input/Sec",
-          "threshold": {
-            "20": "ok",
-            "80": "warning",
-            "*": "critical"
-          },
-          "stats": [
-            "avg(60)"
-          ]
-        },
-        {
-          "id": "\\Memory\\Pages Output/Sec",
-          "threshold": {
-            "20": "ok",
-            "80": "warning",
-            "*": "critical"
-          },
-          "stats": [
-            "avg(60)"
-          ]
-        },
-        {
           "name": "Page File Usage",
           "id": "\\Paging File(_Total)\\% Usage",
           "threshold": {
             "10": "ok",
             "50": "warning",
             "*": "critical"
-          },
-          "stats": [
-            "avg(60)"
-          ]
-        },
-        {
-          "name": "File System Cache",
-          "id": "\\Memory\\Cache Bytes",
-          "format": "0 b",
-          "threshold": {
-            "300000000": "ok",
-            "*": "warning"
-          }
-        },
-        {
-          "id": "\\Memory\\% Committed Bytes in Use",
-          "threshold": {
-            "85": "ok",
-            "90": "warning",
-            "100": "critical"
           }
         }
       ]
@@ -155,17 +91,11 @@
         },
         {
           "id": "\\LogicalDisk(C:)\\Disk Read Bytes/sec",
-          "format": "0 b",
-          "stats": [
-            "avg(60)"
-          ]
+          "format": "0 b"
         },
         {
           "id": "\\LogicalDisk(C:)\\Disk Write Bytes/sec",
-          "format": "0 b",
-          "stats": [
-            "avg(60)"
-          ]
+          "format": "0 b"
         },
         {
           "id": "\\LogicalDisk(C:)\\Avg. Disk sec/Read",
@@ -174,151 +104,17 @@
         {
           "id": "\\LogicalDisk(C:)\\Avg. Disk sec/Write",
           "format": "0 b"
-        },
-        {
-          "id": "\\LogicalDisk(C:)\\Split IO/Sec",
-          "stats": [
-            "avg(60)"
-          ]
-        },
-        {
-          "id": "\\LogicalDisk(C:)\\Current Disk Queue Length",
-          "threshold": {
-            "0": "ok",
-            "2": "warning",
-            "*": "critical"
-          },
-          "stats": [
-            "avg(60)"
-          ]
         }
-      ]
-    },
-    {
-      "name": "TCP/UDP",
-      "column": 2,
-      "counters": [
-        {
-          "id": "\\TCPv4\\Connections Established",
-           "stats": [
-            "avg(60)"
-          ]
-        },
-        {
-          "id": "\\UDPv4\\Datagrams/sec",
-           "stats": [
-            "avg(60)",
-            "sum(60)"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "DNS",
-      "column": 2,
-      "counters": [
-        {
-          "id": "\\DNS\\Total Query Received/sec",
-          "stats": [
-            "avg(60)",
-            "sum(60)"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "HTTP.SYS",
-      "column": 2,
-      "counters": [
-        {
-          "id": "\\HTTP Service Request Queues(_Total)\\CurrentQueueSize",
-          "stats": [
-            "avg(60)"
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Web Service",
-      "column": 2,
-      "counters": [
-        {
-          "id": "\\Web Service(_Total)\\Current Connections",
-          "stats": [
-            "avg(60)"
-          ]
-        },
-        "\\Web Service(_Total)\\Maximum Connections",
-        "\\W3SVC_W3WP(_Total)\\Active Requests",
-        {
-          "id": "\\W3SVC_W3WP(_Total)\\Requests / Sec",
-          "stats": [
-            "avg(60)"
-          ]
-        },
-        {
-          "id": "\\Web Service(_Total)\\Bytes Sent/sec",
-          "format": "0 b",
-          "stats": [
-            "avg(60)"
-          ]
-        },
-        {
-          "id": "\\Web Service(_Total)\\Bytes Received/sec",
-          "format": "0 b",
-          "stats": [
-            "avg(60)"
-          ]
-        },
-        {
-          "id": "\\Web Service(_Total)\\Total Bytes Sent",
-          "format": "0 b"
-        },
-        {
-          "id": "\\Web Service(_Total)\\Total Bytes Received",
-          "format": "0 b"
-        }
-      ]
-    },
-    {
-      "name": "ASP.NET",
-      "column": 2,
-      "counters": [
-        "\\ASP.NET\\Requests Current",
-        {
-          "id": "\\ASP.NET\\Requests Queued",
-          "threshold": {
-            "0": "ok",
-            "10": "warning",
-            "*": "critical"
-          },
-           "stats": [
-            "avg(60)"
-          ]
-        },
-        {
-          "id": "\\ASP.NET\\Requests In Native Queue",
-          "threshold": {
-            "0": "ok",
-            "10": "warning",
-            "*": "critical"
-          },
-           "stats": [
-            "avg(60)"
-          ]
-        },
-        "\\ASP.NET\\Requests Rejected",
-        "\\ASP.NET Applications(_Total)\\Errors Total"
       ]
     },
     {
       "name": "Top",
-      "column": 3,
+      "column": 2,
       "lists": [
         {
           "name": "CPU Usage",
           "id": "\\Process(*)\\% Processor Time",
-          "count": 6,
+          "count": 4,
           "exclude": [
             "_Total",
             "Idle"
@@ -342,7 +138,7 @@
             "3000000000": "ok",
             "*": "warning"
           },
-          "count": 6,
+          "count": 4,
           "format": "0 b"
         }
       ]

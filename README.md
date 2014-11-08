@@ -48,7 +48,7 @@ mon serve [--port <port>]
 ## Config File
 
 To use mon you need to provide it with a config file that specifies which metrics you want to monitor.
-There is a default config file in the config directory that you can use as a template.
+There are some sample config files in the config directory that you can use as a template.
 
 The format of the config file is as follows:
 
