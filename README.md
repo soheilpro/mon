@@ -4,7 +4,7 @@ Painless performance monitoring for Windows.
 ![Screenshot](/SCREENSHOT.png "Screenshot")
 
 ## Features
-- Monitor local and remote servers.
+- Monitor local and remote Windows machines (even from Mac OS or Linux).
 - Completely customizable.
 - Support for thresholds.
 - Support for statistical functions.
