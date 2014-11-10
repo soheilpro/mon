@@ -29,6 +29,8 @@ ConsoleController.prototype.run = function() {
   process.on("SIGINT", function() {
     clearInterval(_this.timer);
     dataSource.stop();
+    cls();
+    process.exit();
   });
 
   dataSource.on("error", function(error) {
