@@ -13,9 +13,11 @@ ServerController.prototype.run = function() {
   var _this = this;
 
   var transport = new HTTPTransport({ port: _this.port });
+  var clientCount = 0;
 
   transport.on("connect", function(connection) {
-    console.log("Client connected: " + connection.id());
+    clientCount++;
+    console.log("Client " + connection.id() + " connected. Total clients: " + clientCount);
 
     var connection = boundary.chunked(connection);
     var dataSource;
@@ -48,7 +50,8 @@ ServerController.prototype.run = function() {
     });
 
     connection.on("close", function() {
-      console.log("Client disconnected: " + connection.id());
+      clientCount--;
+      console.log("Client " + connection.id() + " disconnected. Total clients: " + clientCount);
 
       if (dataSource)
         dataSource.stop();
