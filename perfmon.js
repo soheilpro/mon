@@ -39,7 +39,7 @@ Perfmon.prototype.start = function() {
         return;
       }
 
-      var host = counters.length > 0 ? /\\\\?(\w+)\\/.exec(counters[0])[1] : "";
+      var host = counters.length > 0 ? /\\\\?([^\\]+)\\/.exec(counters[0])[1] : "";
       var time = new Date(row[0]);
       var values = _.rest(row, 1);
 
