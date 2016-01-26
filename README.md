@@ -12,7 +12,7 @@ Painless performance monitoring for Windows.
 - Support for formulas.
 - Support for variables.
 - Support for custom number formats.
-- Automatic process ID to IIS application pool mapping
+- Automatic process ID to IIS application pool mapping.
 
 ## Install
 
@@ -310,7 +310,7 @@ This allows mon to map w3wp processes to their corresponding IIS application poo
 + http://github.com/soheilpro
 
 ## Copyright and License
-Copyright 2014 Soheil Rashidi
+Copyright 2014-2016 Soheil Rashidi
 
 Licensed under the The MIT License (the "License");
 you may not use this work except in compliance with the License.
