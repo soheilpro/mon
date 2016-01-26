@@ -9,6 +9,7 @@ Painless performance monitoring for Windows.
 - Support for thresholds.
 - Support for statistical functions.
 - Support for lists.
+- Support for formulas.
 - Support for variables.
 - Support for custom number formats.
 - Automatic process ID to IIS application pool mapping
@@ -79,6 +80,9 @@ The format of the config file is as follows:
           <b># Display name for the counter (Optional)</b>
           "name": "Total",
 
+          <b># Formula (Optional)</b>
+          "formula": "value / 2",
+
           <b># Format (Default is "0,0")</b>
           <b># See numeraljs.com for a list of available formats.</b>
           "format": "0,0",
@@ -110,6 +114,9 @@ The format of the config file is as follows:
           <b># Name of the Performance Counter to generate the list from</b>
           <b># It must have an asterisk (*) as the instance name.</b>
           "id": "\\Process(*)\\% Processor Time",
+
+          <b># Formula (Optional)</b>
+          "formula": "value / env.NUMBER_OF_PROCESSORS",
 
           <b># Maximum number of items to show (Default is 5)</b>
           "count": 5,
@@ -236,6 +243,33 @@ lists: [
 ]
 </pre>
 
+## Formulas
+You can apply any formula to a counter to transform its value:
+
+<pre>
+"counters": [
+  {
+    "id": "\\Processor(_Total)\\% Processor Time",
+    "name": "CPU Usage",
+    "formula": "value / 2"
+  }
+]
+</pre>
+
+This is particularly useful for the ``\\Process(*)\\% Processor Time`` counter to display its value in percentage:
+
+<pre>
+lists: [
+  {
+    "name": "CPU Usage",
+    "id": "\\Process(*)\\% Processor Time",
+    "formula": "value / env.NUMBER_OF_PROCESSORS"
+  }
+]
+</pre>
+
+Inside your formula, you can use the ``value`` and ``env`` variables to respectively access the counter's original value and a list of server's environment variables.
+
 ## Variables
 Sometimes you need to monitor a set of similar metrics for different applications (for example multiple ASP.NET web sites). Instead of creating a separate config file for each of these applications, you can create a single config file and use variables instead.
 
@@ -263,6 +297,8 @@ To have them append the ID of the process instead (like w3wp_1234), follow the i
 This allows mon to map w3wp processes to their corresponding IIS application pools. Make sure to run mon as admin for this feature to work,
 
 ## Version History
++ **1.1**
+  + Added suppor for formulas.
 + **1.0**
 	+ Initial release
 

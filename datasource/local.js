@@ -1,6 +1,7 @@
 var fs = require("fs");
 var util = require("util");
 var events = require("events");
+var vm = require('vm');
 var Perfmon = require("../perfmon.js");
 var iis = require("../iis.js");
 var _ = require("underscore");
@@ -39,6 +40,16 @@ LocalDataSource.prototype.start = function(config) {
               var match = _.find(data.counters, function(item) { return item.name === counter.id });
               var value = match ? match.value : NaN;
 
+              if (counter.formula) {
+                var sandbox = {
+                  value: value,
+                  env: process.env
+                };
+
+                vm.createContext(sandbox);
+                value = vm.runInContext(counter.formula, sandbox)
+              }
+
               if (counter.stats) {
                 if (!counter.history)
                   counter.history = [];
@@ -71,6 +82,7 @@ LocalDataSource.prototype.start = function(config) {
               var items = [];
               data.counters.forEach(function(counter) {
                 var counterMatch = regex.exec(counter.name);
+                var value = counter.value;
 
                 if (!counterMatch)
                   return;
@@ -79,6 +91,16 @@ LocalDataSource.prototype.start = function(config) {
 
                 if (_.contains(list.exclude, name))
                   return;
+
+                if (list.formula) {
+                  var sandbox = {
+                    value: value,
+                    env: process.env
+                  };
+
+                  vm.createContext(sandbox);
+                  value = vm.runInContext(list.formula, sandbox)
+                }
 
                 var iisWorkerProcessMatch = /w3wp_(\d+)/.exec(name);
 
@@ -92,7 +114,7 @@ LocalDataSource.prototype.start = function(config) {
 
                 items.push({
                   name: name,
-                  value: counter.value,
+                  value: value,
                   threshold: getThresholdByValue(counter.value, list.threshold),
                 });
               });

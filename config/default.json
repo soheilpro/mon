@@ -114,6 +114,7 @@
         {
           "name": "CPU Usage",
           "id": "\\Process(*)\\% Processor Time",
+          "formula": "value / env.NUMBER_OF_PROCESSORS",
           "count": 4,
           "exclude": [
             "_Total",
