@@ -115,7 +115,7 @@ LocalDataSource.prototype.start = function(config) {
                 items.push({
                   name: name,
                   value: value,
-                  threshold: getThresholdByValue(counter.value, list.threshold),
+                  threshold: getThresholdByValue(value, list.threshold),
                 });
               });
 
