@@ -25,6 +25,10 @@ LocalDataSource.prototype.start = function(config) {
                     .unique()
                     .value();
 
+    var context = vm.createContext({
+      env: process.env
+    });
+
     var perfmon = new Perfmon(counters);
     perfmon.start();
 
@@ -41,13 +45,8 @@ LocalDataSource.prototype.start = function(config) {
               var value = match ? match.value : NaN;
 
               if (counter.formula) {
-                var sandbox = {
-                  value: value,
-                  env: process.env
-                };
-
-                vm.createContext(sandbox);
-                value = vm.runInContext(counter.formula, sandbox)
+                context.value = value;
+                value = vm.runInContext(counter.formula, context)
               }
 
               if (counter.stats) {
@@ -93,13 +92,8 @@ LocalDataSource.prototype.start = function(config) {
                   return;
 
                 if (list.formula) {
-                  var sandbox = {
-                    value: value,
-                    env: process.env
-                  };
-
-                  vm.createContext(sandbox);
-                  value = vm.runInContext(list.formula, sandbox)
+                  context.value = value;
+                  value = vm.runInContext(list.formula, context)
                 }
 
                 var iisWorkerProcessMatch = /w3wp_(\d+)/.exec(name);
