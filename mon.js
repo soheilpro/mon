@@ -4,11 +4,14 @@ var fs = require("fs");
 var url = require("url");
 var path = require("path");
 var ConsoleController = require("./controller/console.js")
+var ElasticsearchController = require("./controller/elasticsearch.js")
 var ServerController = require("./controller/server.js")
 var Config = require("./config.js");
 var eol = require("os").EOL;
 var optimist = require("optimist")
-    .usage("Usage:" + eol +
+.default('es-port', 9200)
+.default('es-index-prefix', 'mon-')
+.usage("Usage:" + eol +
            "  mon [<configfile>]" + eol +
            "  mon --server <address>:<port> [<configfile>]" + eol +
            "  mon serve [--port <port>]");
@@ -63,7 +66,18 @@ switch (argv._[0])
     var configFile = argv._[0] || path.resolve(__dirname, "./config/default.json");
     var config = Config.parse(fs.readFileSync(configFile).toString()).instantiate(variables);
 
-    controller = new ConsoleController(server, config);
+    if (argv['es-address']) {
+      var elasticsearchConfig = {
+        address: argv['es-address'],
+        port: argv['es-port'],
+        indexPrefix: argv['es-index-prefix'],
+      };
+
+      controller = new ElasticsearchController(server, config, elasticsearchConfig);
+    }
+    else {
+      controller = new ConsoleController(server, config);
+    }
 }
 
 if (!controller) {
