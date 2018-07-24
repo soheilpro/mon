@@ -13,6 +13,7 @@ Painless performance monitoring for Windows.
 - Support for variables.
 - Support for custom number formats.
 - Automatic process ID to IIS application pool mapping.
+- Support for exporting data to Elasticsearch.
 
 ## Install
 
@@ -297,6 +298,9 @@ To have them append the ID of the process instead (like w3wp_1234), follow the i
 This allows mon to map w3wp processes to their corresponding IIS application pools. Make sure to run mon as admin for this feature to work.
 
 ## Version History
++ **1.2**
+  + Added support for saving data to Elasticsearch.
+  + Fixed a bug where Perfmon returned invalid data.
 + **1.1**
   + Added suppor for formulas.
 + **1.0**
@@ -310,7 +314,7 @@ This allows mon to map w3wp processes to their corresponding IIS application poo
 + http://github.com/soheilpro
 
 ## Copyright and License
-Copyright 2014-2016 Soheil Rashidi
+Copyright 2014-2018 Soheil Rashidi
 
 Licensed under the The MIT License (the "License");
 you may not use this work except in compliance with the License.
