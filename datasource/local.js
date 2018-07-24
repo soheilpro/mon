@@ -158,6 +158,11 @@ LocalDataSource.prototype.start = function(config) {
       _this.emit("snapshot", snapshot);
     });
 
+    perfmon.on("error", function() {
+      _this.stop();
+      _this.start(config);
+    });
+
     _this.perfmon = perfmon;
 
     _this.emit("start");

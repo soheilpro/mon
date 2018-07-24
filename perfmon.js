@@ -55,6 +55,11 @@ Perfmon.prototype.start = function() {
       for (var i = missingCounterIndexes.length - 1; i >= 0; i--)
         values.splice(missingCounterIndexes[i], 1);
 
+      if (counters.length !== values.length) {
+        _this.emit("error");
+        return;
+      }
+
       var result = {
         host: host,
         time: time,
