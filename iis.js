@@ -31,6 +31,10 @@ iis.getWorkerProcesses = function(callback) {
     });
   });
 
+  appcmd.on("error", function() {
+    callback(null, [processes]);
+  });
+
   appcmd.on("close", function() {
     callback(null, processes);
   });
