@@ -1,6 +1,6 @@
 {
   "name": "monjs",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Painless performance monitoring for Windows.",
   "main": "mon.js",
   "dependencies": {
