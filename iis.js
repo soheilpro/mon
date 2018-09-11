@@ -32,7 +32,8 @@ iis.getWorkerProcesses = function(callback) {
   });
 
   appcmd.on("error", function() {
-    callback(null, [processes]);
+    // Ignore if appcmd doesn't exist
+    // Don't need to call the callback, 'close' event will be emitted
   });
 
   appcmd.on("close", function() {
