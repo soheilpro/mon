@@ -298,11 +298,16 @@ To have them append the ID of the process instead (like w3wp_1234), follow the i
 This allows mon to map w3wp processes to their corresponding IIS application pools. Make sure to run mon as admin for this feature to work.
 
 ## Version History
++ **1.3**
+  + Added timestamp to logs.
+  + Fixed a bug that caused Perfmon to start twice on systems that IIS was not installed.
++ **1.2.1**
+  + Fixed a bug that caused mon not to start on systems that IIS was not installed.
 + **1.2**
   + Added support for saving data to Elasticsearch.
   + Fixed a bug where Perfmon returned invalid data.
 + **1.1**
-  + Added suppor for formulas.
+  + Added support for formulas.
 + **1.0**
 	+ Initial release
 
