@@ -5,10 +5,12 @@
   "main": "mon.js",
   "dependencies": {
     "colors": "~1.0.3",
-    "optimist": "~0.6.1",
+    "csv-parse": "0.0.6",
+    "log-timestamp": "^0.1.2",
+    "moment": "^2.22.2",
     "numeral": "~1.5.3",
-    "underscore": "~1.7.0",
-    "csv-parse": "0.0.6"
+    "optimist": "~0.6.1",
+    "underscore": "~1.7.0"
   },
   "devDependencies": {},
   "preferGlobal": true,

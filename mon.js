@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+var moment = require('moment');
+
+require('log-timestamp')(function() {
+  return '[' + moment().format('YYYY-MM-DD hh:mm:ss') + ']'; }
+);
+
 var fs = require("fs");
 var url = require("url");
 var path = require("path");
