@@ -3,6 +3,7 @@ var HTTPTransport = require("../transport/http.js");
 var LocalDataSource = require("../datasource/local.js");
 var RemoteDataSource = require("../datasource/remote.js");
 var _ = require("underscore");
+var moment = require('moment');
 
 function ElasticsearchController(server, config, elasticsearchConfig) {
   var _this = this;
@@ -94,7 +95,7 @@ ElasticsearchController.prototype.createRequest = function(snapshots) {
   for (var snapshot of snapshots) {
     snapshot = _this.transformSnapshot(snapshot);
 
-    var index = _this.elasticsearchConfig.indexPrefix + snapshot['@timestamp'].getUTCFullYear() + '.' + (snapshot['@timestamp'].getUTCMonth() + 1) + '.' + snapshot['@timestamp'].getUTCDate();
+    var index = _this.elasticsearchConfig.indexPrefix + moment.utc(snapshot['@timestamp']).format('YYYY.MM.DD');
     data += '{ "index" : { "_index" : "' + index + '", "_type" : "snapshot" } }\n';
     data += JSON.stringify(snapshot) + '\n';
   }
