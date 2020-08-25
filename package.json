@@ -5,7 +5,7 @@
   "main": "mon.js",
   "dependencies": {
     "colors": "~1.0.3",
-    "csv-parse": "0.0.6",
+    "csv-parse": "4.4.6",
     "log-timestamp": "^0.1.2",
     "moment": "^2.22.2",
     "numeral": "~1.5.3",
