@@ -116,6 +116,10 @@ ElasticsearchController.prototype.transformSnapshot = function(snapshot) {
     });
   });
 
+  _.each(_.keys(_this.config.variables), function(variable) {
+    document['var.' + variable] = _this.config.variables[variable];
+  });
+
   return document;
 }
 
