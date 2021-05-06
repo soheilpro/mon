@@ -10,7 +10,7 @@
     "moment": "^2.22.2",
     "numeral": "~1.5.3",
     "optimist": "~0.6.1",
-    "underscore": "~1.7.0"
+    "underscore": "~1.12.1"
   },
   "devDependencies": {},
   "preferGlobal": true,
